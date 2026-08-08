@@ -1,0 +1,153 @@
+.case-brief-screen {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 32px;
+
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.55)),
+    url("/assets/textures/dark-wood-desk.webp");
+
+  background-size: cover;
+  background-position: center;
+}
+
+.case-paper {
+  width: min(700px, 100%);
+  padding: 64px;
+  color: #241b13;
+
+  background-image: url("/assets/textures/aged-paper.webp");
+  background-size: cover;
+  background-position: center;
+
+  border-radius: 4px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65);
+
+  font-family: "Courier New", Courier, monospace;
+  line-height: 1.55;
+
+  transform: rotate(-0.35deg);
+}
+
+.classification {
+  margin-top: 0;
+  color: #7b1e1e;
+  font-size: 1.4rem;
+  letter-spacing: 0.12em;
+  text-decoration: underline;
+}
+
+.recommendation {
+  margin-top: 28px;
+  color: #781f1f;
+  font-weight: bold;
+}
+
+.mensah-instructions {
+  margin-top: 28px;
+}
+
+.mensah-instructions p {
+  margin: 2px 0;
+}
+
+.signature {
+  margin-top: 36px;
+  font-family: Georgia, serif;
+  font-size: 1.7rem;
+  font-style: italic;
+}
+
+.begin-button {
+  display: block;
+  margin: 36px auto 0;
+  padding: 16px 28px;
+
+  border: 1px solid #8b6b3f;
+  background: #221d18;
+  color: #e8cf9f;
+
+  font: inherit;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.begin-button:hover {
+  background: #332b23;
+}
+
+@media (max-width: 700px) {
+  .case-brief-screen {
+    padding: 16px;
+  }
+
+ .case-paper {
+  width: min(760px, 100%);
+  padding: 72px 76px;
+  font-size: 1.05rem;
+}
+}
+
+.case-heading {
+  margin-bottom: 28px;
+  text-align: right;
+}
+
+.case-number {
+  margin: 0;
+  font-weight: bold;
+  letter-spacing: 0.12em;
+}
+
+.case-title {
+  margin: 4px 0 0;
+  font-family: Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: bold;
+}
+
+.case-photo{
+
+    width:220px;
+
+    margin:40px auto;
+
+    background:#f3efe6;
+
+    padding:12px 12px 36px;
+
+    box-shadow:
+
+        0 8px 25px rgba(0,0,0,.35);
+
+    transform:
+
+        rotate(-4deg);
+
+}
+
+.case-photo img{
+
+    width:100%;
+
+    display:block;
+
+}
+
+.photo-caption{
+
+    text-align:center;
+
+    margin-top:14px;
+
+    font-family:
+
+        "Courier Prime",
+        monospace;
+
+    font-size:.9rem;
+
+}
