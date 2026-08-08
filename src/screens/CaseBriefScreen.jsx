@@ -1,6 +1,6 @@
 import "../styles/case-brief.css";
 import CaseBriefDocument from "../components/case-brief/CaseBriefDocument";
-import scandburyBrief from "../cases/001-scandbury/brief";
+import scandburyBrief from "../cases/001-Scandbury/brief";
 
 export default function CaseBriefScreen() {
   return (
