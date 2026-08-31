@@ -1,6 +1,6 @@
 import CasePhoto from "./CasePhoto";
 
-export default function CaseBriefDocument({ caseData }) {
+export default function CaseBriefDocument({ caseData, onBegin }) {
     return (
         <article className="case-paper">
 
@@ -24,13 +24,13 @@ export default function CaseBriefDocument({ caseData }) {
                 <p key={index}>{paragraph}</p>
             ))}
 
-            <p className="recommendation">
-                {caseData.recommendation}
+            <p className="closing-note">
+                {caseData.closingNote}
             </p>
 
-            <div className="mensah-instructions">
-                {caseData.instructions.map((instruction, index) => (
-                    <p key={index}>{instruction}</p>
+            <div className="mensah-principles">
+                {caseData.mensahPrinciples.map((principle, index) => (
+                    <p key={index}>{principle}</p>
                 ))}
             </div>
 
@@ -43,7 +43,11 @@ export default function CaseBriefDocument({ caseData }) {
                 {caseData.signedBy}
             </p>
 
-            <button className="begin-button">
+            <button
+                className="begin-button"
+                type="button"
+                onClick={onBegin}
+            >
                 Begin Investigation
             </button>
 

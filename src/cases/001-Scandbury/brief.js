@@ -11,16 +11,16 @@ const scandburyBrief = {
         "A matter has come across my desk that I believe requires a careful mind rather than quick judgment.",
         "Edward Scandbury, 67, disappeared from his estate four days ago.",
         "There are no signs of forced entry, no ransom demands, and no confirmed sightings.",
-        "Several individuals appear to possess motive, but motive alone is never proof."
+        "Several individuals appear to possess motive. Their reasons, however, are not yet fully understood"
     ],
 
-    recommendation:
-        "I recommend beginning your investigation at the Scandbury Mansion.",
+    closingNote:
+        "The mansion is where the known facts converge. What remains there is another matter.",
 
-    instructions: [
-        "Speak with everyone.",
-        "Observe everything.",
-        "Assume nothing."
+    mensahPrinciples: [
+        "People remember selectively.",
+        "Locations preserve what people forget.",
+        "Motive is worth examining. It is never proof."
     ],
 
     briefPhoto:

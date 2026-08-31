@@ -39,25 +39,34 @@
   text-decoration: underline;
 }
 
-.recommendation {
+.closing-note {
   margin-top: 28px;
   color: #781f1f;
   font-weight: bold;
 }
 
-.mensah-instructions {
+.mensah-principles {
   margin-top: 28px;
 }
 
-.mensah-instructions p {
+.mensah-principles p {
   margin: 2px 0;
 }
 
 .signature {
-  margin-top: 36px;
-  font-family: Georgia, serif;
-  font-size: 1.7rem;
-  font-style: italic;
+    margin-top: 36px;
+
+    font-family:
+        "Segoe Script",
+        "Bradley Hand",
+        cursive;
+
+    font-size: 1.7rem;
+    font-style: normal;
+
+    color: #2e241b;
+
+    transform: rotate(-1.5deg);
 }
 
 .begin-button {
@@ -109,45 +118,111 @@
   font-weight: bold;
 }
 
-.case-photo{
+.case-photo {
+    width: min(390px, 82%);
 
-    width:220px;
+    margin: 44px auto 48px;
 
-    margin:40px auto;
+    transform: rotate(-2.5deg);
 
-    background:#f3efe6;
+    filter: drop-shadow(3px 7px 5px rgba(0, 0, 0, 0.25));
+}
 
-    padding:12px 12px 36px;
+.case-photo img {
+    width: 100%;
+    display: block;
 
     box-shadow:
-
-        0 8px 25px rgba(0,0,0,.35);
-
-    transform:
-
-        rotate(-4deg);
-
+        2px 3px 5px rgba(0, 0, 0, 0.16);
 }
 
-.case-photo img{
 
-    width:100%;
+.photo-caption {
+    text-align: center;
+    margin-top: 10px;
 
-    display:block;
+    font-family: "Segoe Print", "Bradley Hand", cursive;
+    font-size: 1.05rem;
+    font-style: italic;
 
+    color: #34291f;
+
+    transform: rotate(-1deg);
 }
 
-.photo-caption{
+.photo-caption {
+    position: relative;
+    left: 18px;
+}
 
-    text-align:center;
+.case-photo {
+   position: relative;
+    width: min(390px, 82%);
+    margin: 44px auto 48px;
+    transform: rotate(-2deg);
+}
 
-    margin-top:14px;
+.photo-caption {
+    margin-top: 14px;
+
+    text-align: center;
 
     font-family:
+        "Segoe Script",
+        "Bradley Hand",
+        cursive;
 
-        "Courier Prime",
-        monospace;
+    font-size: 1.05rem;
+    font-style: normal;
 
-    font-size:.9rem;
+    color: #33261c;
 
+    transform:
+        translateX(18px)
+        rotate(-2deg);
+}
+
+The important new trick is:
+
+.photo-image {
+    overflow: hidden;
+
+    box-shadow:
+        3px 6px 8px rgba(0, 0, 0, .28);
+}
+
+.photo-image img {
+    width: 100%;
+    display: block;
+
+    /*
+       Slightly enlarge the original image so its
+       baked-in black outer edge gets cropped away.
+    */
+    transform: scale(1.055);
+}
+
+.case-photo::before {
+    content: "";
+
+    position: absolute;
+    z-index: 2;
+
+    width: 92px;
+    height: 27px;
+
+    top: -12px;
+    left: 50%;
+
+    background: rgba(211, 190, 145, 0.58);
+
+    transform:
+        translateX(-50%)
+        rotate(2.5deg);
+
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.15);
+
+    border-left: 2px solid rgba(255, 255, 255, 0.12);
+    border-right: 2px solid rgba(120, 95, 55, 0.12);
 }
