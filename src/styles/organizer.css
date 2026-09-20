@@ -1,0 +1,1056 @@
+/* =========================================================
+   ORGANIZER SCREEN
+========================================================= */
+
+.organizer-screen {
+  min-height: 100vh;
+
+  display: grid;
+  place-items: center;
+
+  padding: 18px;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at center,
+      #211b16 0%,
+      #0e0c0a 65%,
+      #070605 100%
+    );
+}
+
+
+/* =========================================================
+   PHYSICAL ORGANIZER
+========================================================= */
+
+.organizer {
+  position: relative;
+
+  width: min(1536px, 96vw);
+
+  filter:
+    drop-shadow(
+      0 28px 40px rgba(0, 0, 0, 0.55)
+    );
+}
+
+
+.organizer-base {
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  pointer-events: none;
+
+  user-select: none;
+}
+
+
+/* =========================================================
+   COLLAB NOTES LIVE SCREEN
+========================================================= */
+
+.notes-live-screen {
+  position: absolute;
+
+  left: 14%;
+  top: 15%;
+
+  width: 25.5%;
+  height: 47.5%;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  color: #322617;
+
+  background: transparent;
+
+  z-index: 2;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   COLLAB NOTES META
+========================================================= */
+
+.notes-meta {
+  flex-shrink: 0;
+
+  display: flex;
+  justify-content: space-between;
+
+  padding: 7px 10px;
+
+  border-bottom:
+    1px solid rgba(82, 61, 28, 0.42);
+
+  background:
+    rgba(217, 186, 103, 0.94);
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  font-size:
+    clamp(8px, 0.72vw, 12px);
+}
+
+
+/* =========================================================
+   COLLAB NOTES PAGE
+========================================================= */
+
+.notes-page {
+  flex: 1;
+  min-height: 0;
+
+  padding: 14px 22px 18px;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  font-family:
+    "Segoe Print",
+    "Bradley Hand",
+    cursive;
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    rgba(70, 55, 30, 0.48)
+    transparent;
+}
+
+
+.notes-page::-webkit-scrollbar {
+  width: 5px;
+}
+
+
+.notes-page::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+.notes-page::-webkit-scrollbar-thumb {
+  background:
+    rgba(70, 55, 30, 0.48);
+
+  border-radius: 999px;
+}
+
+
+.notes-page::-webkit-scrollbar-thumb:hover {
+  background:
+    rgba(70, 55, 30, 0.68);
+}
+
+
+.notes-page h2 {
+  margin: 4px 0;
+
+  font-size:
+    clamp(15px, 1.45vw, 23px);
+}
+
+
+.notes-time,
+.notes-subtitle {
+  margin: 4px 0;
+}
+
+
+.notes-page p {
+  line-height: 1.55;
+}
+
+
+/* =========================================================
+   COLLAB NOTES SHARING INFO
+========================================================= */
+
+.notes-sharing {
+  display: flex;
+  flex-direction: column;
+
+  margin-bottom: 10px;
+
+  color:
+    rgba(63, 47, 24, 0.72);
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  font-size:
+    clamp(7px, 0.64vw, 11px);
+}
+
+
+.notes-sharing small + small {
+  margin-top: 2px;
+}
+
+
+/* =========================================================
+   COLLAB NOTES CONTROLS
+========================================================= */
+
+.notes-controls {
+  flex-shrink: 0;
+
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  border-top:
+    1px solid rgba(72, 51, 18, 0.35);
+
+  background: transparent;
+}
+
+
+.notes-controls button {
+  border: 0;
+
+  background: transparent;
+
+  color: #21190e;
+
+  font-size:
+    clamp(14px, 1.15vw, 20px);
+
+  cursor: pointer;
+}
+
+
+.notes-controls button:disabled {
+  opacity: 0.22;
+
+  cursor: default;
+}
+
+
+/* =========================================================
+   NOTEBOOK SKETCH
+========================================================= */
+
+.notes-sketch {
+  margin: 16px 0 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  font-size: 0.78rem;
+
+  transform: rotate(-1deg);
+}
+
+
+.hatch-sketch {
+  position: relative;
+
+  width: 90px;
+  height: 52px;
+
+  margin-bottom: 7px;
+
+  border:
+    2px solid rgba(65, 48, 26, 0.72);
+
+  transform:
+    perspective(100px)
+    rotateX(14deg)
+    rotate(-3deg);
+}
+
+
+.hatch-inner {
+  position: absolute;
+
+  left: 8px;
+  top: 7px;
+  right: 8px;
+  bottom: 7px;
+
+  border:
+    1px solid rgba(65, 48, 26, 0.6);
+}
+
+
+.amara-note {
+  margin-top: 18px;
+
+  text-align: right;
+
+  font-family:
+    "Segoe Print",
+    "Bradley Hand",
+    cursive;
+
+  font-size: 0.9rem;
+}
+
+
+/* =========================================================
+   PEAR LIVE SCREEN
+========================================================= */
+
+.pear-live-screen {
+  position: absolute;
+
+  left: 58.2%;
+  top: 15.2%;
+
+  width: 21%;
+  height: 52%;
+
+  box-sizing: border-box;
+
+  padding:
+    2% 3% 3%;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  color: #ece7dd;
+
+  background: transparent;
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  font-size:
+    clamp(9px, 0.78vw, 14px);
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    rgba(205, 205, 195, 0.35)
+    transparent;
+
+  z-index: 2;
+}
+
+
+.pear-live-screen::-webkit-scrollbar {
+  width: 5px;
+}
+
+
+.pear-live-screen::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+.pear-live-screen::-webkit-scrollbar-thumb {
+  background:
+    rgba(205, 205, 195, 0.35);
+
+  border-radius: 999px;
+}
+
+
+.pear-live-screen::-webkit-scrollbar-thumb:hover {
+  background:
+    rgba(205, 205, 195, 0.55);
+}
+
+
+/* =========================================================
+   PEAR CONTACT
+========================================================= */
+
+.pear-contact {
+  display: flex;
+  justify-content: space-between;
+
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+
+  border-bottom:
+    1px solid #333;
+}
+
+
+.pear-contact strong,
+.pear-contact small {
+  display: block;
+}
+
+
+.pear-contact small {
+  margin-top: 4px;
+
+  color: #aaa;
+}
+
+
+.pear-contact .online {
+  color: #8ac88a;
+}
+
+
+/* =========================================================
+   MESSAGE INDICATOR
+========================================================= */
+
+.message-indicator {
+  position: relative;
+
+  font-size: 1.4rem;
+}
+
+
+.message-indicator b {
+  position: absolute;
+
+  top: -8px;
+  right: -12px;
+
+  width: 18px;
+  height: 18px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: #9f3329;
+
+  color: white;
+
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   PEAR APPS
+========================================================= */
+
+.pear-apps {
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 10px;
+}
+
+
+.pear-app {
+  min-height: 80px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px solid #333;
+
+  border-radius: 10px;
+
+  color: #ded5c4;
+
+  background:
+    linear-gradient(
+      145deg,
+      #252a25,
+      #171a18
+    );
+
+  cursor: pointer;
+
+  box-shadow:
+    0 7px 12px
+    rgba(0, 0, 0, 0.25);
+}
+
+
+.pear-app span {
+  margin-bottom: 5px;
+
+  font-size:
+    clamp(18px, 1.55vw, 28px);
+}
+
+
+.pear-app small {
+  margin-top: 5px;
+
+  color: #aaa;
+
+  font-size:
+    clamp(7px, 0.57vw, 10px);
+}
+
+
+/* =========================================================
+   PEAR APP SCREENS
+========================================================= */
+
+.pear-app-screen {
+  min-height: 100%;
+
+  display: flex;
+  flex-direction: column;
+}
+
+
+.pear-app-header {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+
+  border-bottom:
+    1px solid #333;
+}
+
+
+.pear-app-header button {
+  border: 0;
+
+  background: transparent;
+
+  color: #ddd6c8;
+
+  font-size: 1.4rem;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
+.message-thread {
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+
+.message-thread-person strong,
+.message-thread-person small {
+  display: block;
+}
+
+
+.message-thread-person small {
+  margin-top: 3px;
+
+  color: #aaa;
+}
+
+
+.message-thread-person .online {
+  color: #8ac88a;
+}
+
+
+.message-bubble {
+  padding: 12px 14px;
+
+  border:
+    1px solid #343a36;
+
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #222723,
+      #171a18
+    );
+
+  box-shadow:
+    0 5px 10px
+    rgba(0, 0, 0, 0.2);
+}
+
+
+.message-bubble small {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #8f968f;
+
+  font-size: 0.68rem;
+}
+
+
+.message-bubble p {
+  margin: 0 0 10px;
+
+  line-height: 1.45;
+}
+
+
+.message-bubble p:last-child {
+  margin-bottom: 0;
+}
+
+
+/* =========================================================
+   PEAR MAP
+========================================================= */
+
+.pear-map-screen {
+  min-height: 100%;
+}
+
+
+.case-map {
+  position: relative;
+
+  width: 100%;
+
+  aspect-ratio: 4 / 5;
+
+  overflow: hidden;
+
+  border:
+    1px solid #343a36;
+
+  border-radius: 7px;
+
+  background: #101513;
+}
+
+
+.case-map-image {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  user-select: none;
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   MAP LOCATION MARKERS
+========================================================= */
+
+.map-marker {
+  position: absolute;
+
+  transform:
+    translate(-50%, -50%);
+
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  z-index: 5;
+}
+
+
+.map-marker-x {
+  width: 21px;
+  height: 21px;
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  border:
+    1px solid rgba(255, 244, 225, 0.35);
+
+  border-radius: 50%;
+
+  background:
+    #a94432;
+
+  color:
+    #fff8e8;
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.5);
+
+  transition:
+    transform 120ms ease;
+}
+
+
+.map-marker-label {
+  min-width: 92px;
+
+  padding: 5px 7px;
+
+  border:
+    1px solid rgba(92, 72, 35, 0.38);
+
+  border-radius: 5px;
+
+  background:
+    rgba(239, 219, 154, 0.96);
+
+  color:
+    #2f281b;
+
+  text-align: left;
+
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.35);
+
+  pointer-events: none;
+}
+
+
+.map-marker-label strong,
+.map-marker-label small {
+  display: block;
+}
+
+
+.map-marker-label strong {
+  white-space: nowrap;
+
+  font-size:
+    clamp(7px, 0.58vw, 10px);
+
+  line-height: 1.15;
+}
+
+
+.map-marker-label small {
+  margin-top: 2px;
+
+  color:
+    #65583c;
+
+  font-size:
+    clamp(6px, 0.48vw, 8px);
+
+  line-height: 1.1;
+}
+
+
+.map-marker:hover {
+  z-index: 8;
+}
+
+
+.map-marker:hover .map-marker-x {
+  transform:
+    scale(1.15);
+}
+
+
+/* =========================================================
+   MAP ZOOM CONTROLS
+========================================================= */
+
+.map-zoom-controls {
+  position: absolute;
+
+  right: 6px;
+  bottom: 6px;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border:
+    1px solid rgba(220, 220, 210, 0.24);
+
+  border-radius: 5px;
+
+  background:
+    rgba(15, 18, 17, 0.9);
+
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.35);
+
+  z-index: 9;
+}
+
+
+.map-zoom-controls button {
+  width: 27px;
+  height: 27px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  border: 0;
+
+  border-bottom:
+    1px solid rgba(220, 220, 210, 0.15);
+
+  background: transparent;
+
+  color: #e2ddd2;
+
+  font-size: 18px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+
+.map-zoom-controls button:last-child {
+  border-bottom: 0;
+}
+
+
+.map-zoom-controls button:hover:not(:disabled) {
+  background:
+    rgba(255, 255, 255, 0.08);
+}
+
+
+.map-zoom-controls button:disabled {
+  opacity: 0.25;
+
+  cursor: default;
+}
+
+
+/* =========================================================
+   MAP VIEW LABEL
+========================================================= */
+
+.map-view-label {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #858a86;
+
+  font-size:
+    clamp(6px, 0.5vw, 9px);
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   PEAR PERSISTENT HAMBURGER HOTSPOT
+========================================================= */
+
+.pear-menu-hotspot {
+  position: absolute;
+
+  left: 58%;
+  top: 8.5%;
+
+  width: 4%;
+  height: 6%;
+
+  border: 0;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  z-index: 10;
+}
+
+
+/* =========================================================
+   PHYSICAL ORGANIZER HOTSPOTS
+========================================================= */
+
+.document-pocket-hotspot,
+.photo-pocket-hotspot,
+.small-item-pocket-hotspot,
+.latch-hotspot {
+  position: absolute;
+
+  border: 0;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  z-index: 6;
+}
+
+
+/* large lower-left pocket */
+.document-pocket-hotspot {
+  left: 2.5%;
+  bottom: 5%;
+
+  width: 42%;
+  height: 23%;
+}
+
+
+/* upper-right card/photo area */
+.photo-pocket-hotspot {
+  right: 2.5%;
+  top: 18%;
+
+  width: 12%;
+  height: 31%;
+}
+
+
+/* lower-right small-item pocket */
+.small-item-pocket-hotspot {
+  right: 2.5%;
+  bottom: 8%;
+
+  width: 12%;
+  height: 28%;
+}
+
+
+/* center latch */
+.latch-hotspot {
+  left: 47.2%;
+  bottom: -1%;
+
+  width: 6%;
+  height: 13%;
+}
+
+
+/* subtle physical hover feedback */
+.document-pocket-hotspot:hover,
+.photo-pocket-hotspot:hover,
+.small-item-pocket-hotspot:hover,
+.latch-hotspot:hover,
+.pear-menu-hotspot:hover {
+  background:
+    rgba(255, 255, 255, 0.012);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .organizer-screen {
+    padding: 6px;
+  }
+
+
+  .notes-page {
+    padding:
+      10px 14px 14px;
+  }
+
+
+  .notes-controls {
+    height: 30px;
+  }
+
+
+  .pear-live-screen {
+    padding:
+      2% 2.5% 3%;
+  }
+
+
+  .pear-app {
+    min-height: 55px;
+  }
+
+
+  .map-marker-x {
+    width: 17px;
+    height: 17px;
+
+    font-size: 14px;
+  }
+
+
+  .map-marker-label {
+    min-width: 74px;
+
+    padding:
+      4px 5px;
+  }
+}
+/* Regional area selection: temporary prototype rectangle, replaced by
+   authored polygon hotspots as neighbourhoods are added. */
+.map-region-hotspot {
+  position: absolute;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  z-index: 3;
+}
+.map-region-hotspot:focus-visible {
+  outline: 2px solid #e9d18c;
+  outline-offset: -2px;
+}
+
+/* Compass is Pear UI, not baked into individual map images. */
+.map-compass {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: rgba(15, 18, 17, 0.82);
+  color: #f0e5cb;
+  font-size: 10px;
+  line-height: 1.05;
+  pointer-events: none;
+  z-index: 9;
+}
+.map-compass span:last-child { font-size: 16px; }
+.map-notice {
+  display: block;
+  margin-top: 5px;
+  color: #e9d18c;
+  text-align: center;
+}
