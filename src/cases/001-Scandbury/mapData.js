@@ -2,16 +2,14 @@
 /* =========================================================
    CASE 001 — PEAR MAP DATA
 
-   Regional map → Geographic region → Neighbourhood
-   → Discovered location → Property map
+   Navigation:
+   Regional → Neighbourhood → Property → Arrival Interaction Point
 
-   Polygon and marker coordinates are percentages (0–100).
+   All map coordinates are percentages (0–100).
 ========================================================= */
 
 export const caseMap = {
-  regionalImage:
-    "/cases/001-scandbury/map/regional.webp",
-
+  regionalImage: "/cases/001-scandbury/map/regional.webp",
   regionalLabel: "Regional View"
 };
 
@@ -19,38 +17,38 @@ export const caseMap = {
 /* =========================================================
    GEOGRAPHIC REGIONS
 
-   Each region has its own neighbourhood map.
+   A region represents a geographic area, not an
+   individual location.
 
-   The polygon defines its clickable area on the
-   REGIONAL map. These shapes are invisible in normal play.
+   Its polygon is clickable on the regional map,
+   even though the polygon is invisible during gameplay.
 
-   Coordinates below are provisional. Adjust them using
-   the map-debug class while testing.
-
-   Adding another neighbourhood:
-   1. Add its WebP image.
-   2. Add another region here.
-   3. Assign discovered locations to its region ID.
+   Coordinates are provisional and can be adjusted
+   using the map's debug mode.
 ========================================================= */
 
 export const mapRegions = {
   "old-town": {
     id: "old-town",
-
     name: "Old Town",
 
-    image:
-      "/cases/001-scandbury/map/neighbourhood.webp",
+    image: "/cases/001-scandbury/map/neighbourhood.webp",
 
-    polygon: [
-      [40, 23],
-      [55, 20],
-      [70, 25],
-      [75, 36],
-      [70, 49],
-      [57, 55],
-      [43, 46]
-    ]
+    
+polygon: [
+  [38, 22],
+  [47, 19],
+  [58, 20],
+  [67, 25],
+  [72, 32],
+  [73, 40],
+  [69, 47],
+  [61, 52],
+  [52, 50],
+  [45, 45],
+  [39, 37],
+  [36, 29]
+]
   }
 };
 
@@ -58,98 +56,111 @@ export const mapRegions = {
 /* =========================================================
    INVESTIGATION LOCATIONS
 
-   A location belongs to a geographic region.
+   discovered:
+     Controls whether the location's X and label appear.
 
-   Its marker is only shown when discovered === true.
+   regionId:
+     Determines which neighbourhood contains the location.
 
-   The neighbourhood position identifies the location
-   on its region's neighbourhood map.
+   propertyImage:
+     A location with no property map is reference-only.
+     It can appear on maps but cannot be travelled to.
 
-   The property position identifies the location
-   on its own property map.
+   positions:
+     regional      = small X on regional map
+     neighbourhood = X on neighbourhood map
+     property      = property reference position; arrivalPoints carry actionable entry positions
 
-   Later, discovered will come from the shared case state
-   rather than being hardcoded here.
+   Discovery will eventually come from shared case state.
 ========================================================= */
 
 export const mapLocations = [
   {
     id: "scandbury-mansion",
-
     name: "Scandbury Mansion",
-
-    subtitle: "Old Town",
+    subtitle: "Old Town, Aldercombe",
 
     regionId: "old-town",
-
     discovered: true,
 
     propertyImage:
       "/cases/001-scandbury/map/scandbury-mansion/property.webp",
 
+    travelEnabled: true,
+
+    arrivalPoints: [
+      {
+        id: "main-entrance",
+        label: "Main Entrance",
+        sceneId: "exterior",
+        discovered: true,
+        travelAccessible: true,
+        position: { x: 53, y: 32 }
+      },
+      {
+        id: "service-entrance",
+        label: "Service Entrance",
+        sceneId: "service-entrance",
+        discovered: false,
+        travelAccessible: false,
+        position: { x: 67, y: 61 }
+      }
+    ],
+
     positions: {
+      regional: {
+        x: 54,
+        y: 32
+      },
+
       neighbourhood: {
-        x: 68,
-        y: 25
+        x: 61,
+        y: 38
       },
 
       property: {
-        x: 51,
-        y: 43
+        x: 53,
+        y: 32
       }
     }
   },
 
   {
     id: "scandbury-pharmacy",
-
     name: "Scandbury Pharmacy",
-
     subtitle: "Rivalte",
 
     regionId: "town-centre",
-
     discovered: false,
 
-    propertyImage:
-      "/cases/001-scandbury/map/town-centre/scandbury-pharmacy/property.webp",
+    // Placeholder until this location's map is authored.
+    propertyImage: null,
+    travelEnabled: false,
 
     positions: {
-      neighbourhood: {
-        x: 50,
-        y: 50
-      },
-
-      property: {
-        x: 50,
-        y: 50
+      regional: {
+        x: 61,
+        y: 64
       }
     }
   },
 
   {
     id: "st-bartholomews",
-
     name: "St. Bartholomew's Cemetery",
-
     subtitle: "North Ridge",
 
     regionId: "north-ridge",
-
     discovered: false,
 
-    propertyImage:
-      "/cases/001-scandbury/map/north-ridge/st-bartholomews/property.webp",
+    // Placeholder until this location's map is authored.
+    propertyImage: null,
+    travelEnabled: false,
 
     positions: {
-      neighbourhood: {
-        x: 50,
-        y: 50
-      },
-
-      property: {
-        x: 50,
-        y: 50
+      regional: {
+        x: 28,
+        y: 30
       }
     }
   }
@@ -179,5 +190,15 @@ export function getDiscoveredLocations(regionId) {
     (location) =>
       location.discovered &&
       location.regionId === regionId
+  );
+}
+
+
+export function canTravelToLocation(location) {
+  return Boolean(
+    location?.discovered &&
+    location?.travelEnabled &&
+    location?.propertyImage &&
+    location?.positions?.property
   );
 }

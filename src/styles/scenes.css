@@ -1,0 +1,1093 @@
+.world-scene {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #080705;
+  color: #f4f1e9;
+}
+
+.world-scene__image-wrap {
+  position: absolute;
+  inset: 0;
+  transform-origin: var(--scene-origin-x, 50%) var(--scene-origin-y, 50%);
+  transform: scale(var(--scene-scale, 1));
+  transition: transform 520ms cubic-bezier(.2,.72,.2,1);
+}
+
+.world-scene__image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
+}
+
+.world-scene--focus .world-scene__image-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 140px rgba(0,0,0,.3);
+  pointer-events: none;
+}
+
+.world-scene__markers {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.scene-marker-anchor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  pointer-events: auto;
+}
+
+.scene-marker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 46px;
+  height: 46px;
+  transform: translate(-50%, -50%);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+
+.scene-marker-anchor--visible .scene-marker { opacity: 1; }
+
+.scene-marker__dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 1px 7px rgba(0,0,0,.65);
+}
+
+.scene-marker__pulse {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255,255,255,.7);
+  border-radius: 50%;
+  animation: scene-marker-pulse 2.35s ease-out infinite;
+}
+
+.scene-marker__label {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 15px);
+  transform: translateX(-50%) translateY(3px);
+  width: max-content;
+  max-width: 190px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  background: rgba(8,8,8,.68);
+  color: rgba(255,255,255,.95);
+  font: 500 clamp(10px, .72vw, 12px)/1.15 Arial, sans-serif;
+  letter-spacing: .025em;
+  text-shadow: 0 1px 2px #000;
+  opacity: .72;
+  transition: opacity 150ms ease, transform 150ms ease;
+  pointer-events: none;
+}
+
+.scene-marker:hover .scene-marker__label,
+.scene-marker:focus-visible .scene-marker__label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.scene-marker:focus-visible { outline: none; }
+.scene-marker:focus-visible .scene-marker__dot { box-shadow: 0 0 0 3px rgba(255,255,255,.3), 0 1px 7px rgba(0,0,0,.65); }
+
+@keyframes scene-marker-pulse {
+  0%, 68% { transform: translate(-50%, -50%) scale(.8); opacity: 0; }
+  72% { opacity: .7; }
+  100% { transform: translate(-50%, -50%) scale(2.7); opacity: 0; }
+}
+
+.world-scene__placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  padding: 24px;
+  background: radial-gradient(ellipse at 55% 35%, #514537 0%, #26251f 48%, #10110f 100%);
+}
+.world-scene__placeholder span { font: 11px Arial, sans-serif; letter-spacing: .24em; color: #c1a878; }
+.world-scene__placeholder h1 { font: 42px Georgia, serif; font-weight: normal; margin: 16px 0; }
+.world-scene__placeholder p { font: 14px Arial, sans-serif; color: #a9a399; }
+
+@media (hover: none) {
+  .scene-marker__label { opacity: .9; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-marker__pulse { animation: none; }
+  .world-scene__image-wrap { transition: none; }
+}
+
+/* =========================================================
+   WORLD TRAVEL FADE
+========================================================= */
+.travel-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: #050403;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 650ms cubic-bezier(.4, 0, .2, 1),
+    visibility 0s linear 650ms;
+}
+
+.travel-curtain--visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity 650ms cubic-bezier(.4, 0, .2, 1),
+    visibility 0s linear 0s;
+}
+
+/* =========================================================
+   CINEMATIC LOCATION TITLE
+========================================================= */
+.location-title {
+  position: fixed;
+  z-index: 18;
+  left: clamp(22px, 4vw, 72px);
+  bottom: clamp(28px, 7vh, 86px);
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  color: #f3ead7;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,.78));
+  animation: location-title-life 5s ease both;
+}
+
+.location-title__lead {
+  position: relative;
+  width: 68px;
+  height: 16px;
+  flex: 0 0 68px;
+}
+
+.location-title__line {
+  position: absolute;
+  left: 4px;
+  top: 8px;
+  width: 64px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(218,177,93,.18), rgba(242,211,143,.9));
+  transform-origin: left center;
+  animation: location-line-life 5s ease both;
+}
+
+.location-title__spark {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  z-index: 2;
+  color: #f2cf83;
+  font: 12px/1 Georgia, serif;
+  text-shadow: 0 0 6px rgba(244,199,105,.8), 0 0 13px rgba(244,199,105,.42);
+  animation: location-spark-life 5s ease both;
+}
+
+.location-title__copy {
+  overflow: hidden;
+  min-width: 0;
+  padding: 3px 0 4px;
+}
+
+.location-title__copy strong,
+.location-title__copy span {
+  display: block;
+  white-space: nowrap;
+  transform: translateX(-108%);
+  opacity: 0;
+  animation: location-copy-life 5s cubic-bezier(.2,.72,.2,1) both;
+}
+
+.location-title__copy strong {
+  font: 400 clamp(18px, 1.65vw, 27px)/1.05 Georgia, "Times New Roman", serif;
+  letter-spacing: .13em;
+}
+
+.location-title__copy span {
+  margin-top: 7px;
+  color: rgba(235,222,195,.82);
+  font: 500 clamp(9px, .72vw, 12px)/1 Arial, sans-serif;
+  letter-spacing: .30em;
+  text-transform: uppercase;
+  animation-delay: 80ms;
+}
+
+@keyframes location-title-life {
+  0%, 4% { opacity: 0; }
+  12%, 78% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+
+@keyframes location-line-life {
+  0%, 4% { transform: scaleX(0); opacity: 0; }
+  15%, 78% { transform: scaleX(1); opacity: 1; }
+  94%, 100% { transform: scaleX(0); opacity: 0; transform-origin: left center; }
+}
+
+@keyframes location-copy-life {
+  0%, 7% { transform: translateX(-108%); opacity: 0; }
+  20%, 78% { transform: translateX(0); opacity: 1; }
+  94%, 100% { transform: translateX(-108%); opacity: 0; }
+}
+
+@keyframes location-spark-life {
+  0%, 4% { left: 0; opacity: 0; transform: scale(.65) rotate(0deg); }
+  7% { opacity: 1; }
+  17% { left: 62px; opacity: 1; transform: scale(1.1) rotate(70deg); }
+  24%, 76% { left: 62px; opacity: .15; transform: scale(.7) rotate(115deg); }
+  80% { opacity: 1; }
+  94% { left: 0; opacity: 1; transform: scale(1) rotate(210deg); }
+  100% { left: 0; opacity: 0; transform: scale(.5) rotate(240deg); }
+}
+
+@media (max-width: 700px) {
+  .location-title { left: 20px; bottom: 28px; gap: 9px; }
+  .location-title__lead { width: 44px; flex-basis: 44px; }
+  .location-title__line { width: 40px; }
+  @keyframes location-spark-life {
+    0%, 4% { left: 0; opacity: 0; transform: scale(.65) rotate(0deg); }
+    7% { opacity: 1; }
+    17% { left: 38px; opacity: 1; transform: scale(1.1) rotate(70deg); }
+    24%, 76% { left: 38px; opacity: .15; transform: scale(.7) rotate(115deg); }
+    80% { opacity: 1; }
+    94% { left: 0; opacity: 1; transform: scale(1) rotate(210deg); }
+    100% { left: 0; opacity: 0; transform: scale(.5) rotate(240deg); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .travel-curtain { transition-duration: 1ms; }
+  .location-title,
+  .location-title__line,
+  .location-title__spark,
+  .location-title__copy strong,
+  .location-title__copy span { animation-duration: 1ms; }
+}
+
+/* =========================================================
+   SCENE ATMOSPHERE — subtle deterministic life over stills
+   The master scene remains untouched. These layers use exact
+   source pixels and move only a few pixels/degrees.
+========================================================= */
+.scene-atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.scene-atmosphere__foliage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.atmosphere-foliage--broadleaf-upper {
+  transform-origin: 27% 12%;
+  animation: scandbury-broadleaf-wind 7.8s ease-in-out -1.1s infinite;
+}
+
+/* Palms do not sway as a single rigid crown. Only isolated upper fronds move,
+   and each group gets a different, much smaller bend. */
+.atmosphere-foliage--palm-mid-fronds {
+  transform-origin: 77% 22%;
+  animation: scandbury-palm-mid-fronds 8.9s ease-in-out -3.2s infinite;
+}
+
+.atmosphere-foliage--palm-right-fronds {
+  transform-origin: 89% 23%;
+  animation: scandbury-palm-right-fronds 10.7s ease-in-out -5.4s infinite;
+}
+
+/* Hedge tips should almost register subconsciously rather than visibly sway. */
+.atmosphere-foliage--hedge-tips {
+  transform-origin: 24% 41%;
+  animation: scandbury-hedge-flutter 5.6s ease-in-out -1.7s infinite;
+}
+
+@keyframes scandbury-broadleaf-wind {
+  0%, 100% { transform: translate3d(-2px, 1px, 0) rotate(-0.10deg); }
+  30% { transform: translate3d(3px, -2px, 0) rotate(0.17deg); }
+  58% { transform: translate3d(5px, -1px, 0) rotate(0.24deg); }
+  78% { transform: translate3d(1px, 2px, 0) rotate(0.04deg); }
+}
+
+@keyframes scandbury-palm-mid-fronds {
+  0%, 100% { transform: rotate(-0.045deg) translate3d(0, 0, 0); }
+  42% { transform: rotate(0.085deg) translate3d(1px, -1px, 0); }
+  70% { transform: rotate(0.025deg) translate3d(0, 1px, 0); }
+}
+
+@keyframes scandbury-palm-right-fronds {
+  0%, 100% { transform: rotate(0.035deg) translate3d(0, 0, 0); }
+  37% { transform: rotate(-0.075deg) translate3d(-1px, 0, 0); }
+  66% { transform: rotate(0.055deg) translate3d(1px, -1px, 0); }
+}
+
+@keyframes scandbury-hedge-flutter {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  34% { transform: translate3d(1px, -1px, 0); }
+  61% { transform: translate3d(-1px, 0, 0); }
+  82% { transform: translate3d(1px, 0, 0); }
+}
+
+.scene-atmosphere__leaves {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.wind-leaf {
+  --leaf-scale: 1;
+  position: absolute;
+  left: -5vw;
+  top: 72%;
+  width: 20px;
+  height: 10px;
+  border-radius: 80% 12% 80% 12%;
+  background: linear-gradient(135deg, rgba(119,85,34,.94), rgba(188,139,58,.9));
+  box-shadow: 0 1px 2px rgba(0,0,0,.28);
+  opacity: 0;
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+
+.wind-leaf::after {
+  content: "";
+  position: absolute;
+  left: 48%;
+  top: 48%;
+  width: 7px;
+  height: 1px;
+  background: rgba(73,51,22,.5);
+  transform: rotate(-18deg);
+  transform-origin: left center;
+}
+
+.wind-leaf--one {
+  --leaf-scale: 1.05;
+  animation: scandbury-leaf-one 29s linear 5s infinite;
+}
+
+.wind-leaf--two {
+  --leaf-scale: .82;
+  top: 66%;
+  animation: scandbury-leaf-two 37s linear 18s infinite;
+}
+
+.wind-leaf--three {
+  --leaf-scale: 1.18;
+  top: 79%;
+  animation: scandbury-leaf-three 43s linear 31s infinite;
+}
+
+/* Most of each cycle is intentionally invisible: leaves should feel incidental. */
+@keyframes scandbury-leaf-one {
+  0%, 15% { transform: translate3d(-8vw, 0, 0) rotate(0deg) scale(var(--leaf-scale)); opacity: 0; }
+  16% { opacity: .82; }
+  20% { transform: translate3d(24vw, -14px, 0) rotate(220deg) scale(var(--leaf-scale)); opacity: .88; }
+  24% { transform: translate3d(57vw, 8px, 0) rotate(510deg) scale(var(--leaf-scale)); opacity: .78; }
+  28% { transform: translate3d(91vw, -9px, 0) rotate(790deg) scale(var(--leaf-scale)); opacity: .55; }
+  29%, 100% { transform: translate3d(112vw, 3px, 0) rotate(930deg) scale(var(--leaf-scale)); opacity: 0; }
+}
+
+@keyframes scandbury-leaf-two {
+  0%, 43% { transform: translate3d(-8vw, 0, 0) rotate(20deg) scale(var(--leaf-scale)); opacity: 0; }
+  44% { opacity: .66; }
+  48% { transform: translate3d(32vw, 10px, 0) rotate(280deg) scale(var(--leaf-scale)); opacity: .74; }
+  52% { transform: translate3d(68vw, -12px, 0) rotate(610deg) scale(var(--leaf-scale)); opacity: .58; }
+  55%, 100% { transform: translate3d(108vw, 4px, 0) rotate(890deg) scale(var(--leaf-scale)); opacity: 0; }
+}
+
+@keyframes scandbury-leaf-three {
+  0%, 70% { transform: translate3d(-8vw, 0, 0) rotate(-15deg) scale(var(--leaf-scale)); opacity: 0; }
+  71% { opacity: .72; }
+  75% { transform: translate3d(29vw, -18px, 0) rotate(250deg) scale(var(--leaf-scale)); opacity: .8; }
+  79% { transform: translate3d(62vw, 6px, 0) rotate(570deg) scale(var(--leaf-scale)); opacity: .68; }
+  83% { transform: translate3d(94vw, -7px, 0) rotate(820deg) scale(var(--leaf-scale)); opacity: .42; }
+  84%, 100% { transform: translate3d(112vw, 2px, 0) rotate(980deg) scale(var(--leaf-scale)); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-atmosphere__foliage,
+  .wind-leaf { animation: none !important; }
+  .wind-leaf { display: none; }
+}
+
+/* =========================================================
+   LOOK DIRECTION — edge-proximity Interaction Points
+   Turning changes the authored view, not the physical position.
+========================================================= */
+.look-zone {
+  position: absolute;
+  z-index: 8;
+  top: 0;
+  bottom: 0;
+  width: clamp(72px, 10vw, 150px);
+  pointer-events: auto;
+}
+.look-zone--left { left: 0; }
+.look-zone--right { right: 0; }
+
+.look-point {
+  top: 50%;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+.look-zone--left .look-point { left: clamp(30px, 3.1vw, 48px); }
+.look-zone--right .look-point { left: auto; right: clamp(30px, 3.1vw, 48px); transform: translate(50%, -50%); }
+
+.look-zone:hover .look-point,
+.look-zone:focus-within .look-point,
+.look-zone--touch-revealed .look-point { opacity: 1; }
+
+.look-zone--left .scene-marker__label { left: 50%; }
+.look-zone--right .scene-marker__label { left: 50%; }
+
+/* A turn is deliberately brief: blur hides the unauthored intermediate angles
+   while perspective/translation reads as a head/body rotation, not a slide. */
+.world-scene--turning .world-scene__image-wrap {
+  transition: transform 180ms cubic-bezier(.4,0,.2,1), filter 180ms ease, opacity 180ms ease;
+  filter: blur(10px);
+  opacity: .92;
+}
+.world-scene--turning-left .world-scene__image-wrap {
+  transform: scale(1.035) translate3d(2.1%, 0, 0) perspective(900px) rotateY(1.2deg);
+  transform-origin: 0% 50%;
+}
+.world-scene--turning-right .world-scene__image-wrap {
+  transform: scale(1.035) translate3d(-2.1%, 0, 0) perspective(900px) rotateY(-1.2deg);
+  transform-origin: 100% 50%;
+}
+
+@media (hover: none) {
+  .look-zone { width: clamp(64px, 14vw, 110px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .world-scene--turning .world-scene__image-wrap {
+    transition-duration: 1ms;
+    filter: none;
+    transform: none;
+  }
+}
+
+/* PASS 1B — directional overlap. The incoming authored view swings into the
+   blurred field of vision instead of reading as an instantaneous still swap. */
+.world-scene__image--incoming {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+  filter: blur(13px);
+  will-change: transform, opacity, filter;
+}
+.world-scene--turning .world-scene__image-wrap {
+  /* Keep the scene frame stationary; the two authored views move inside it. */
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  overflow: hidden;
+}
+.world-scene--turning .world-scene__image--current,
+.world-scene--turning .world-scene__image--incoming {
+  animation-duration: 380ms;
+  animation-timing-function: cubic-bezier(.32,.02,.18,1);
+  animation-fill-mode: both;
+}
+.world-scene--turning-left .world-scene__image--current { animation-name: mensah-turn-left-out; }
+.world-scene--turning-left .world-scene__image--incoming { animation-name: mensah-turn-left-in; }
+.world-scene--turning-right .world-scene__image--current { animation-name: mensah-turn-right-out; }
+.world-scene--turning-right .world-scene__image--incoming { animation-name: mensah-turn-right-in; }
+
+@keyframes mensah-turn-left-out {
+  0%   { transform: translate3d(0,0,0) scale(1); filter: blur(0); opacity: 1; }
+  50%  { transform: translate3d(5.5%,0,0) scale(1.035); filter: blur(12px); opacity: .72; }
+  100% { transform: translate3d(10%,0,0) scale(1.045); filter: blur(15px); opacity: 0; }
+}
+@keyframes mensah-turn-left-in {
+  0%   { transform: translate3d(-11%,0,0) scale(1.045); filter: blur(15px); opacity: 0; }
+  38%  { opacity: .58; }
+  50%  { transform: translate3d(-5%,0,0) scale(1.03); filter: blur(11px); opacity: .82; }
+  100% { transform: translate3d(0,0,0) scale(1); filter: blur(0); opacity: 1; }
+}
+@keyframes mensah-turn-right-out {
+  0%   { transform: translate3d(0,0,0) scale(1); filter: blur(0); opacity: 1; }
+  50%  { transform: translate3d(-5.5%,0,0) scale(1.035); filter: blur(12px); opacity: .72; }
+  100% { transform: translate3d(-10%,0,0) scale(1.045); filter: blur(15px); opacity: 0; }
+}
+@keyframes mensah-turn-right-in {
+  0%   { transform: translate3d(11%,0,0) scale(1.045); filter: blur(15px); opacity: 0; }
+  38%  { opacity: .58; }
+  50%  { transform: translate3d(5%,0,0) scale(1.03); filter: blur(11px); opacity: .82; }
+  100% { transform: translate3d(0,0,0) scale(1); filter: blur(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .world-scene--turning .world-scene__image--current,
+  .world-scene--turning .world-scene__image--incoming { animation-duration: 1ms; filter: none; }
+}
+
+/* =========================================================
+   PASS 2A — SHORT WALK
+   A high-resolution still behaves like a lightweight camera plane. The
+   destination crop/plate is introduced only near the end, under motion blur.
+========================================================= */
+.world-scene__image--walk-target {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  z-index: 3;
+  object-fit: cover;
+  pointer-events: none;
+  will-change: transform, opacity, filter;
+}
+
+.world-scene--walking .world-scene__markers,
+.world-scene--walking .look-zone {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.world-scene--walking .world-scene__image-wrap {
+  overflow: hidden;
+  transform: none;
+  transition: none;
+}
+
+.world-scene--walking .world-scene__image--current {
+  transform-origin: 50% 58%;
+  animation: mensah-short-walk-current 3100ms cubic-bezier(.18,.55,.2,1) both;
+  will-change: transform, filter, opacity;
+}
+
+.world-scene--walking .world-scene__image--walk-target {
+  animation: mensah-short-walk-target 3100ms cubic-bezier(.18,.55,.2,1) both;
+}
+
+@keyframes mensah-short-walk-current {
+  0%   { transform: translate3d(0,0,0) scale(1); filter: blur(0); opacity: 1; }
+  10%  { transform: translate3d(-.25%,-.45%,0) scale(1.035); }
+  20%  { transform: translate3d(.28%,.28%,0) scale(1.07); }
+  30%  { transform: translate3d(-.3%,-.48%,0) scale(1.105); }
+  40%  { transform: translate3d(.3%,.26%,0) scale(1.14); }
+  50%  { transform: translate3d(-.28%,-.42%,0) scale(1.18); }
+  60%  { transform: translate3d(.25%,.24%,0) scale(1.22); filter: blur(.4px); opacity: 1; }
+  70%  { transform: translate3d(-.2%,-.34%,0) scale(1.255); filter: blur(1.1px); opacity: .94; }
+  80%  { transform: translate3d(.16%,.16%,0) scale(1.29); filter: blur(2.4px); opacity: .74; }
+  90%  { transform: translate3d(-.1%,-.16%,0) scale(1.315); filter: blur(3.4px); opacity: .28; }
+  100% { transform: translate3d(0,0,0) scale(1.33); filter: blur(4px); opacity: 0; }
+}
+
+@keyframes mensah-short-walk-target {
+  0%, 68% { transform: translate3d(0,.35%,0) scale(1.055); filter: blur(5px); opacity: 0; }
+  78% { transform: translate3d(.12%,-.22%,0) scale(1.04); filter: blur(3px); opacity: .35; }
+  88% { transform: translate3d(-.08%,.12%,0) scale(1.02); filter: blur(1.2px); opacity: .82; }
+  100% { transform: translate3d(0,0,0) scale(1); filter: blur(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .world-scene--walking .world-scene__image--current { animation: mensah-short-walk-reduced-current 180ms ease both; }
+  .world-scene--walking .world-scene__image--walk-target { animation: mensah-short-walk-reduced-target 180ms ease both; }
+}
+@keyframes mensah-short-walk-reduced-current { to { opacity: 0; } }
+@keyframes mensah-short-walk-reduced-target { from { opacity: 0; } to { opacity: 1; } }
+
+/* =========================================================
+   PASS 2B — WALKING CALIBRATION
+   Compare a continuous figure-eight head/body path against a simpler
+   pendulum gait. Both use slower, rounded motion and larger weight transfer.
+========================================================= */
+.walk-gait-tester {
+  position: fixed;
+  z-index: 26;
+  left: 50%;
+  top: 18px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 999px;
+  background: rgba(9,10,11,.72);
+  backdrop-filter: blur(8px);
+  font: 600 10px/1 Arial, sans-serif;
+  letter-spacing: .05em;
+  color: rgba(255,255,255,.72);
+}
+.walk-gait-tester span { padding: 0 7px; text-transform: uppercase; }
+.walk-gait-tester button {
+  min-height: 30px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255,255,255,.82);
+  cursor: pointer;
+  font: inherit;
+}
+.walk-gait-tester button.is-active { background: rgba(255,255,255,.16); color: #fff; }
+.walk-gait-tester button:focus-visible { outline: 2px solid rgba(255,255,255,.8); outline-offset: 2px; }
+
+.world-scene--walking .world-scene__image--current,
+.world-scene--walking .world-scene__image--walk-target {
+  animation-duration: 4400ms;
+  animation-timing-function: linear;
+}
+
+/* Figure 8: weighted/soft-edge calibration (Pass 2D).
+   Horizontal radius comes back ~12% from Pass 2C, while each outer lobe gets
+   a rounded shoulder: the camera eases into the weight-bearing edge, rolls
+   through it, then eases away instead of snapping direction. Vertical motion
+   is phase-offset slightly so the footfall and maximum lateral reach do not
+   occur at the exact same instant. */
+.world-scene--walking.world-scene--gait-figure8 .world-scene__image--current {
+  animation-name: mensah-walk-figure8-current;
+}
+.world-scene--walking.world-scene--gait-figure8 .world-scene__image--walk-target {
+  animation-name: mensah-walk-figure8-target;
+}
+@keyframes mensah-walk-figure8-current {
+  0%    { transform: translate3d(0,0,0) rotate(0deg) scale(1); filter: blur(0); opacity:1; }
+  5.7%  { transform: translate3d(-.897%,.728%,0) rotate(-.11deg) scale(1.020); }
+  7.3%  { transform: translate3d(-1.012%,.92%,0) rotate(-.13deg) scale(1.026); }
+  9.1%  { transform: translate3d(-.92%,.984%,0) rotate(-.11deg) scale(1.032); }
+  13.5% { transform: translate3d(-.299%,-.482%,0) rotate(-.035deg) scale(1.048); }
+  17.6% { transform: translate3d(.943%,.781%,0) rotate(.12deg) scale(1.064); }
+  19.2% { transform: translate3d(1.069%,.963%,0) rotate(.14deg) scale(1.070); }
+  21.0% { transform: translate3d(.966%,1.027%,0) rotate(.12deg) scale(1.077); }
+  25.5% { transform: translate3d(.265%,-.535%,0) rotate(.025deg) scale(1.094); }
+  29.5% { transform: translate3d(-.966%,.802%,0) rotate(-.12deg) scale(1.110); }
+  31.2% { transform: translate3d(-1.104%,.984%,0) rotate(-.15deg) scale(1.117); }
+  33.0% { transform: translate3d(-1%,1.049%,0) rotate(-.12deg) scale(1.124); }
+  37.5% { transform: translate3d(-.241%,-.503%,0) rotate(-.025deg) scale(1.142); }
+  41.7% { transform: translate3d(.908%,.749%,0) rotate(.11deg) scale(1.159); }
+  43.4% { transform: translate3d(1.023%,.931%,0) rotate(.13deg) scale(1.166); }
+  45.2% { transform: translate3d(.931%,.995%,0) rotate(.11deg) scale(1.173); }
+  49.8% { transform: translate3d(.218%,-.556%,0) rotate(.025deg) scale(1.192); }
+  53.8% { transform: translate3d(-1.012%,.824%,0) rotate(-.13deg) scale(1.209); }
+  55.5% { transform: translate3d(-1.15%,1.016%,0) rotate(-.16deg) scale(1.216); }
+  57.3% { transform: translate3d(-1.035%,1.07%,0) rotate(-.13deg) scale(1.223); }
+  62.0% { transform: translate3d(-.265%,-.471%,0) rotate(-.035deg) scale(1.241); filter:blur(.2px); opacity:1; }
+  66.2% { transform: translate3d(.931%,.77%,0) rotate(.12deg) scale(1.258); filter:blur(.36px); opacity:.99; }
+  67.9% { transform: translate3d(1.058%,.952%,0) rotate(.14deg) scale(1.265); filter:blur(.45px); opacity:.98; }
+  69.7% { transform: translate3d(.954%,1.006%,0) rotate(.12deg) scale(1.271); filter:blur(.55px); opacity:.97; }
+  74.2% { transform: translate3d(.207%,-.503%,0) rotate(.025deg) scale(1.286); filter:blur(.8px); opacity:.94; }
+  78.3% { transform: translate3d(-.908%,.717%,0) rotate(-.11deg) scale(1.300); filter:blur(1.12px); opacity:.86; }
+  79.9% { transform: translate3d(-1.035%,.888%,0) rotate(-.13deg) scale(1.304); filter:blur(1.25px); opacity:.82; }
+  81.7% { transform: translate3d(-.931%,.942%,0) rotate(-.11deg) scale(1.309); filter:blur(1.40px); opacity:.76; }
+  86.0% { transform: translate3d(-.196%,-.374%,0) rotate(-.02deg) scale(1.318); filter:blur(1.8px); opacity:.62; }
+  90.4% { transform: translate3d(.678%,.514%,0) rotate(.075deg) scale(1.326); filter:blur(2.3px); opacity:.39; }
+  92.0% { transform: translate3d(.782%,.653%,0) rotate(.09deg) scale(1.328); filter:blur(2.5px); opacity:.30; }
+  93.6% { transform: translate3d(.69%,.685%,0) rotate(.075deg) scale(1.330); filter:blur(2.65px); opacity:.23; }
+  100%  { transform: translate3d(0,0,0) rotate(0deg) scale(1.335); filter:blur(3px); opacity:0; }
+}
+@keyframes mensah-walk-figure8-target {
+  0%,72% { transform:translate3d(0,.4%,0) rotate(0deg) scale(1.045); filter:blur(4px); opacity:0; }
+  78.5% { transform:translate3d(-.52%,.43%,0) rotate(-.06deg) scale(1.035); filter:blur(2.8px); opacity:.18; }
+  80.5% { transform:translate3d(-.59%,.56%,0) rotate(-.07deg) scale(1.031); filter:blur(2.3px); opacity:.31; }
+  82.5% { transform:translate3d(-.52%,.59%,0) rotate(-.06deg) scale(1.028); filter:blur(2.0px); opacity:.40; }
+  86% { transform:translate3d(.47%,-.25%,0) rotate(.05deg) scale(1.022); filter:blur(1.5px); opacity:.58; }
+  90.5% { transform:translate3d(-.27%,.24%,0) rotate(-.03deg) scale(1.014); filter:blur(.9px); opacity:.79; }
+  92% { transform:translate3d(-.31%,.31%,0) rotate(-.035deg) scale(1.012); filter:blur(.7px); opacity:.86; }
+  94% { transform:translate3d(-.27%,.32%,0) rotate(-.03deg) scale(1.009); filter:blur(.5px); opacity:.91; }
+  100% { transform:translate3d(0,0,0) rotate(0deg) scale(1); filter:blur(0); opacity:1; }
+}
+
+/* Pendulum: same forward travel, but lateral weight transfer is simpler and
+   more regular. Vertical dips still coincide with the eight footfalls. */
+.world-scene--walking.world-scene--gait-pendulum .world-scene__image--current {
+  animation-name: mensah-walk-pendulum-current;
+}
+.world-scene--walking.world-scene--gait-pendulum .world-scene__image--walk-target {
+  animation-name: mensah-walk-pendulum-target;
+}
+@keyframes mensah-walk-pendulum-current {
+  0% { transform:translate3d(0,0,0) rotate(0) scale(1); filter:blur(0); opacity:1; }
+  7.3% { transform:translate3d(-.72%,.62%,0) rotate(-.13deg) scale(1.026); }
+  13.3% { transform:translate3d(0,-.30%,0) rotate(0) scale(1.048); }
+  19.2% { transform:translate3d(.74%,.65%,0) rotate(.13deg) scale(1.070); }
+  25.3% { transform:translate3d(0,-.32%,0) rotate(0) scale(1.094); }
+  31.2% { transform:translate3d(-.76%,.67%,0) rotate(-.14deg) scale(1.117); }
+  37.3% { transform:translate3d(0,-.31%,0) rotate(0) scale(1.142); }
+  43.4% { transform:translate3d(.73%,.64%,0) rotate(.13deg) scale(1.166); }
+  49.5% { transform:translate3d(0,-.33%,0) rotate(0) scale(1.192); }
+  55.5% { transform:translate3d(-.77%,.68%,0) rotate(-.14deg) scale(1.216); }
+  61.8% { transform:translate3d(0,-.29%,0) rotate(0) scale(1.241); filter:blur(.2px); opacity:1; }
+  67.9% { transform:translate3d(.72%,.63%,0) rotate(.13deg) scale(1.265); filter:blur(.45px); opacity:.98; }
+  74.0% { transform:translate3d(0,-.28%,0) rotate(0) scale(1.286); filter:blur(.8px); opacity:.94; }
+  79.9% { transform:translate3d(-.68%,.58%,0) rotate(-.12deg) scale(1.304); filter:blur(1.25px); opacity:.82; }
+  86% { transform:translate3d(0,-.22%,0) rotate(0) scale(1.318); filter:blur(1.8px); opacity:.62; }
+  92% { transform:translate3d(.46%,.42%,0) rotate(.08deg) scale(1.328); filter:blur(2.5px); opacity:.30; }
+  100% { transform:translate3d(0,0,0) rotate(0) scale(1.335); filter:blur(3px); opacity:0; }
+}
+@keyframes mensah-walk-pendulum-target {
+  0%,72% { transform:translate3d(0,.35%,0) scale(1.045); filter:blur(4px); opacity:0; }
+  82% { transform:translate3d(-.28%,.34%,0) rotate(-.05deg) scale(1.029); filter:blur(2px); opacity:.38; }
+  91% { transform:translate3d(.18%,-.16%,0) rotate(.03deg) scale(1.013); filter:blur(.8px); opacity:.82; }
+  100% { transform:translate3d(0,0,0) rotate(0) scale(1); filter:blur(0); opacity:1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .walk-gait-tester { display:none; }
+  .world-scene--walking.world-scene--gait-figure8 .world-scene__image--current,
+  .world-scene--walking.world-scene--gait-pendulum .world-scene__image--current { animation:mensah-short-walk-reduced-current 180ms ease both; }
+  .world-scene--walking.world-scene--gait-figure8 .world-scene__image--walk-target,
+  .world-scene--walking.world-scene--gait-pendulum .world-scene__image--walk-target { animation:mensah-short-walk-reduced-target 180ms ease both; }
+}
+
+/* =========================================================
+   PASS 3B — PERSPECTIVE WALK, LOCKED 2E GAIT
+   IMPORTANT: medium-distance walking does not invent a new gait. These
+   keyframes repeat the exact 2E lateral/vertical/roll rhythm at the exact
+   2E cadence. The only new behavior is the authored-image handoff.
+========================================================= */
+.world-scene--walk-perspective .world-scene__image--current,
+.world-scene--walk-perspective .world-scene__image--walk-target {
+  animation-duration: 6600ms;
+  animation-timing-function: linear;
+}
+
+.world-scene--walk-perspective.world-scene--gait-figure8 .world-scene__image--current {
+  animation-name: mensah-perspective-2e-current;
+}
+.world-scene--walk-perspective.world-scene--gait-figure8 .world-scene__image--walk-target {
+  animation-name: mensah-perspective-2e-target;
+}
+
+/* PASS 3C: standard 2E gait with +30% forward advance per stride.
+   Gait x/y/roll/cadence and footfall phase remain locked.
+   2E is a 4.4 s / eight-footfall cycle.  A 6.6 s medium walk is exactly
+   1.5 cycles. Percentages below are the 2E keyframe times mapped onto that
+   longer timeline, then repeated from the beginning for the final half-cycle.
+   Scale advances continuously; x/y/roll are the locked 2E gait. */
+@keyframes mensah-perspective-2e-current {
+  0%      { transform:translate3d(0,0,0) rotate(0deg) scale(1.000); filter:blur(0); opacity:1; }
+  3.80%   { transform:translate3d(-.897%,.728%,0) rotate(-.11deg) scale(1.023); }
+  4.87%   { transform:translate3d(-1.012%,.92%,0) rotate(-.13deg) scale(1.030); }
+  6.07%   { transform:translate3d(-.92%,.984%,0) rotate(-.11deg) scale(1.038); }
+  9.00%   { transform:translate3d(-.299%,-.482%,0) rotate(-.035deg) scale(1.056); }
+  11.73%  { transform:translate3d(.943%,.781%,0) rotate(.12deg) scale(1.073); }
+  12.80%  { transform:translate3d(1.069%,.963%,0) rotate(.14deg) scale(1.079); }
+  14.00%  { transform:translate3d(.966%,1.027%,0) rotate(.12deg) scale(1.087); }
+  17.00%  { transform:translate3d(.265%,-.535%,0) rotate(.025deg) scale(1.107); }
+  19.67%  { transform:translate3d(-.966%,.802%,0) rotate(-.12deg) scale(1.123); }
+  20.80%  { transform:translate3d(-1.104%,.984%,0) rotate(-.15deg) scale(1.130); }
+  22.00%  { transform:translate3d(-1%,1.049%,0) rotate(-.12deg) scale(1.138); }
+  25.00%  { transform:translate3d(-.241%,-.503%,0) rotate(-.025deg) scale(1.156); }
+  27.80%  { transform:translate3d(.908%,.749%,0) rotate(.11deg) scale(1.174); }
+  28.93%  { transform:translate3d(1.023%,.931%,0) rotate(.13deg) scale(1.181); }
+  30.13%  { transform:translate3d(.931%,.995%,0) rotate(.11deg) scale(1.189); }
+  33.20%  { transform:translate3d(.218%,-.556%,0) rotate(.025deg) scale(1.207); }
+  35.87%  { transform:translate3d(-1.012%,.824%,0) rotate(-.13deg) scale(1.224); }
+  37.00%  { transform:translate3d(-1.15%,1.016%,0) rotate(-.16deg) scale(1.231); }
+  38.20%  { transform:translate3d(-1.035%,1.07%,0) rotate(-.13deg) scale(1.238); }
+  41.33%  { transform:translate3d(-.265%,-.471%,0) rotate(-.035deg) scale(1.257); }
+  44.13%  { transform:translate3d(.931%,.77%,0) rotate(.12deg) scale(1.276); }
+  45.27%  { transform:translate3d(1.058%,.952%,0) rotate(.14deg) scale(1.282); }
+  46.47%  { transform:translate3d(.954%,1.006%,0) rotate(.12deg) scale(1.290); }
+  49.47%  { transform:translate3d(.207%,-.503%,0) rotate(.025deg) scale(1.308); }
+  52.20%  { transform:translate3d(-.908%,.717%,0) rotate(-.11deg) scale(1.325); }
+  53.27%  { transform:translate3d(-1.035%,.888%,0) rotate(-.13deg) scale(1.333); }
+  54.47%  { transform:translate3d(-.931%,.942%,0) rotate(-.11deg) scale(1.339); }
+  57.33%  { transform:translate3d(-.196%,-.374%,0) rotate(-.02deg) scale(1.357); }
+  60.27%  { transform:translate3d(.678%,.514%,0) rotate(.075deg) scale(1.376); filter:blur(.2px); opacity:1; }
+  61.33%  { transform:translate3d(.782%,.653%,0) rotate(.09deg) scale(1.382); filter:blur(.35px); opacity:.99; }
+  62.40%  { transform:translate3d(.69%,.685%,0) rotate(.075deg) scale(1.389); filter:blur(.55px); opacity:.97; }
+  66.67%  { transform:translate3d(0,0,0) rotate(0deg) scale(1.415); filter:blur(1.1px); opacity:.90; }
+  70.47%  { transform:translate3d(-.897%,.728%,0) rotate(-.11deg) scale(1.438); filter:blur(1.45px); opacity:.83; }
+  71.53%  { transform:translate3d(-1.012%,.92%,0) rotate(-.13deg) scale(1.445); filter:blur(1.65px); opacity:.78; }
+  72.73%  { transform:translate3d(-.92%,.984%,0) rotate(-.11deg) scale(1.452); filter:blur(1.9px); opacity:.70; }
+  75.67%  { transform:translate3d(-.299%,-.482%,0) rotate(-.035deg) scale(1.471); filter:blur(2.5px); opacity:.50; }
+  78.40%  { transform:translate3d(.943%,.781%,0) rotate(.12deg) scale(1.488); filter:blur(3.2px); opacity:.27; }
+  79.47%  { transform:translate3d(1.069%,.963%,0) rotate(.14deg) scale(1.494); filter:blur(3.5px); opacity:.18; }
+  80.67%  { transform:translate3d(.966%,1.027%,0) rotate(.12deg) scale(1.502); filter:blur(3.8px); opacity:.10; }
+  83.67%  { transform:translate3d(.265%,-.535%,0) rotate(.025deg) scale(1.520); filter:blur(4.2px); opacity:.03; }
+  100%    { transform:translate3d(0,0,0) rotate(0deg) scale(1.611); filter:blur(5px); opacity:0; }
+}
+
+/* Destination plate inherits the same 2E gait phase. It enters during the
+   second cycle, already moving with the same x/y/roll rather than beginning
+   a separate animation. */
+@keyframes mensah-perspective-2e-target {
+  0%,57.33% { transform:translate3d(-.196%,-.374%,0) rotate(-.02deg) scale(1.060); filter:blur(5px); opacity:0; }
+  60.27% { transform:translate3d(.678%,.514%,0) rotate(.075deg) scale(1.055); filter:blur(4.2px); opacity:.08; }
+  61.33% { transform:translate3d(.782%,.653%,0) rotate(.09deg) scale(1.053); filter:blur(3.8px); opacity:.13; }
+  62.40% { transform:translate3d(.69%,.685%,0) rotate(.075deg) scale(1.051); filter:blur(3.4px); opacity:.20; }
+  66.67% { transform:translate3d(0,0,0) rotate(0deg) scale(1.043); filter:blur(2.5px); opacity:.42; }
+  70.47% { transform:translate3d(-.897%,.728%,0) rotate(-.11deg) scale(1.037); filter:blur(1.8px); opacity:.62; }
+  71.53% { transform:translate3d(-1.012%,.92%,0) rotate(-.13deg) scale(1.035); filter:blur(1.6px); opacity:.68; }
+  72.73% { transform:translate3d(-.92%,.984%,0) rotate(-.11deg) scale(1.033); filter:blur(1.4px); opacity:.74; }
+  75.67% { transform:translate3d(-.299%,-.482%,0) rotate(-.035deg) scale(1.028); filter:blur(1.0px); opacity:.84; }
+  78.40% { transform:translate3d(.943%,.781%,0) rotate(.12deg) scale(1.023); filter:blur(.72px); opacity:.91; }
+  79.47% { transform:translate3d(1.069%,.963%,0) rotate(.14deg) scale(1.021); filter:blur(.62px); opacity:.93; }
+  80.67% { transform:translate3d(.966%,1.027%,0) rotate(.12deg) scale(1.019); filter:blur(.52px); opacity:.95; }
+  83.67% { transform:translate3d(.265%,-.535%,0) rotate(.025deg) scale(1.014); filter:blur(.34px); opacity:.98; }
+  86.33% { transform:translate3d(-.966%,.802%,0) rotate(-.12deg) scale(1.010); filter:blur(.20px); opacity:1; }
+  87.47% { transform:translate3d(-1.104%,.984%,0) rotate(-.15deg) scale(1.009); filter:blur(.16px); opacity:1; }
+  88.67% { transform:translate3d(-1%,1.049%,0) rotate(-.12deg) scale(1.008); filter:blur(.12px); opacity:1; }
+  91.67% { transform:translate3d(-.241%,-.503%,0) rotate(-.025deg) scale(1.005); filter:blur(.06px); opacity:1; }
+  94.47% { transform:translate3d(.908%,.749%,0) rotate(.11deg) scale(1.003); filter:blur(0); opacity:1; }
+  95.60% { transform:translate3d(1.023%,.931%,0) rotate(.13deg) scale(1.002); filter:blur(0); opacity:1; }
+  96.80% { transform:translate3d(.931%,.995%,0) rotate(.11deg) scale(1.001); filter:blur(0); opacity:1; }
+  100% { transform:translate3d(0,0,0) rotate(0deg) scale(1); filter:blur(0); opacity:1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .world-scene--walk-perspective.world-scene--gait-figure8 .world-scene__image--current { animation:mensah-short-walk-reduced-current 180ms ease both; }
+  .world-scene--walk-perspective.world-scene--gait-figure8 .world-scene__image--walk-target { animation:mensah-short-walk-reduced-target 180ms ease both; }
+}
+
+
+/* OCT 2026 V4 — brisk exaggerated forward perspective warp.
+   Five staggered image planes stretch outward from the scene centre. Their
+   overlapping transparent, differently blurred scales simulate rushing
+   perspective streaks; the destination contracts from a huge magnification.
+   Keep this isolated to marker-triggered forward movement, NOT focus zoom. */
+.world-scene--warping .world-scene__markers,
+.world-scene--warping .look-zone { opacity: 0; pointer-events: none; }
+.world-scene--warping .world-scene__image-wrap {
+  transform: none !important;
+  transition: none !important;
+  overflow: hidden;
+  isolation: isolate;
+}
+.world-scene__warp-echo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: 50% 54%;
+  z-index: 2;
+  will-change: transform, filter, opacity;
+}
+.world-scene--warping .world-scene__image--current {
+  animation: mensah-v3-depart 720ms cubic-bezier(.19,.68,.26,1) both !important;
+  transform-origin: 50% 54%;
+  will-change: transform, filter, opacity;
+}
+.world-scene--warping .world-scene__warp-echo--one { animation: mensah-v3-echo-one 720ms ease-in both; }
+.world-scene--warping .world-scene__warp-echo--two { animation: mensah-v3-echo-two 720ms ease-in both; }
+.world-scene--warping .world-scene__warp-echo--three { animation: mensah-v3-echo-three 720ms ease-in both; }
+.world-scene--warping .world-scene__warp-echo--four { animation: mensah-v3-echo-four 720ms ease-in both; }
+.world-scene--warping .world-scene__image--walk-target {
+  animation: mensah-v3-arrive 720ms cubic-bezier(.18,.67,.19,1) both !important;
+  transform-origin: 50% 54%;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  will-change: transform, filter, opacity;
+}
+@keyframes mensah-v3-depart {
+  0%   { transform: scale(1); filter: blur(0); opacity: 1; }
+  12%  { transform: scale(1.05); filter: blur(0); opacity: 1; }
+  30%  { transform: scale(1.35); filter: blur(1.5px); opacity: 1; }
+  48%  { transform: scale(1.9); filter: blur(4px); opacity: .82; }
+  63%  { transform: scale(2.75); filter: blur(11px); opacity: .25; }
+  73%,100% { transform: scale(3.1); filter: blur(17px); opacity: 0; }
+}
+@keyframes mensah-v3-echo-one {
+  0%,15% { transform: scale(1); opacity: 0; filter: blur(0); }
+  31% { transform: scale(1.25); opacity: .28; filter: blur(1px); }
+  49% { transform: scale(1.9); opacity: .48; filter: blur(5px); }
+  65% { transform: scale(2.85); opacity: .13; filter: blur(11px); }
+  78%,100% { transform: scale(3.4); opacity: 0; filter: blur(17px); }
+}
+@keyframes mensah-v3-echo-two {
+  0%,21% { transform: scale(1); opacity: 0; filter: blur(0); }
+  41% { transform: scale(1.38); opacity: .33; filter: blur(2px); }
+  57% { transform: scale(2.2); opacity: .38; filter: blur(6px); }
+  72% { transform: scale(3.25); opacity: .1; filter: blur(13px); }
+  82%,100% { transform: scale(3.8); opacity: 0; filter: blur(20px); }
+}
+@keyframes mensah-v3-echo-three {
+  0%,27% { transform: scale(1); opacity: 0; filter: blur(0); }
+  48% { transform: scale(1.5); opacity: .27; filter: blur(2px); }
+  62% { transform: scale(2.45); opacity: .31; filter: blur(7px); }
+  78%,100% { transform: scale(4); opacity: 0; filter: blur(23px); }
+}
+@keyframes mensah-v3-echo-four {
+  0%,34% { transform: scale(1); opacity: 0; filter: blur(0); }
+  53% { transform: scale(1.65); opacity: .22; filter: blur(3px); }
+  67% { transform: scale(2.9); opacity: .27; filter: blur(12px); }
+  83%,100% { transform: scale(4.4); opacity: 0; filter: blur(26px); }
+}
+@keyframes mensah-v3-arrive {
+  0%,45% { transform: scale(2.4); filter: blur(20px); opacity: 0; }
+  56% { transform: scale(2.1); filter: blur(15px); opacity: .18; }
+  66% { transform: scale(1.65); filter: blur(9px); opacity: .6; }
+  77% { transform: scale(1.27); filter: blur(4px); opacity: .96; }
+  90% { transform: scale(1.045); filter: blur(.8px); opacity: 1; }
+  100% { transform: scale(1); filter: blur(0); opacity: 1; }
+}
+/* Close examination remains the existing clean, brisk desk focus. */
+.world-scene__image-wrap { transition-duration: 350ms; }
+@media (prefers-reduced-motion: reduce) {
+  .world-scene--warping .world-scene__image--current { animation: mensah-short-walk-reduced-current 180ms ease both !important; }
+  .world-scene--warping .world-scene__image--walk-target { animation: mensah-short-walk-reduced-target 180ms ease both !important; }
+  .world-scene--warping .world-scene__warp-echo { animation: none !important; opacity: 0 !important; }
+  .world-scene__image-wrap { transition-duration: 1ms; }
+}
+
+/* OCT 2026 V5: A/B/C movement laboratory. Each mode uses just two images,
+   not the earlier staggered multi-echo planes. The fade is the starting default. */
+.world-scene--movement-radial .world-scene__image--current,
+.world-scene--movement-push .world-scene__image--current,
+.world-scene--movement-fade .world-scene__image--current,
+.world-scene--movement-radial .world-scene__image--walk-target,
+.world-scene--movement-push .world-scene__image--walk-target,
+.world-scene--movement-fade .world-scene__image--walk-target {
+  animation-duration: unset !important;
+  animation-fill-mode: both !important;
+  transform-origin: 50% 50%;
+}
+.world-scene--warping .world-scene__image--walk-target {z-index:3; position:absolute; inset:0;}
+/* For radial: one source image, displaced outward along radial vectors;
+   next image gently comes in as distortion resolves. */
+.movement-radial-filter-defs {position:absolute; width:0; height:0; overflow:hidden; pointer-events:none;}
+.world-scene--movement-radial .world-scene__image--current {
+  filter: url(#mensah-radial-stretch);
+  animation: mensah-radial-out 620ms cubic-bezier(.2,.7,.25,1) both !important;
+}
+.world-scene--movement-radial .world-scene__image--walk-target {
+  animation: mensah-radial-in 620ms ease-out both !important;
+}
+@keyframes mensah-radial-out {
+  0% { transform:scale(1); opacity:1; }
+  38% { transform:scale(1.15); opacity:1; }
+  66% { transform:scale(1.40); opacity:.7; }
+  100% { transform:scale(1.6); opacity:0; }
+}
+@keyframes mensah-radial-in {
+  0%,42% { transform:scale(1.15); opacity:0; filter:blur(6px); }
+  75% { transform:scale(1.04); opacity:.9; filter:blur(1px); }
+  100% { transform:scale(1); opacity:1; filter:blur(0); }
+}
+.world-scene--movement-push .world-scene__image--current {
+  animation: mensah-push-out 520ms cubic-bezier(.22,.61,.36,1) both !important;
+}
+.world-scene--movement-push .world-scene__image--walk-target {
+  animation: mensah-push-in 520ms ease-in-out both !important;
+}
+@keyframes mensah-push-out {
+  0% { transform:scale(1); opacity:1; }
+  45% { transform:scale(1.13); opacity:1; }
+  100% { transform:scale(1.28); opacity:0; }
+}
+@keyframes mensah-push-in {
+  0%,24% { transform:scale(1.10); opacity:0; }
+  100% { transform:scale(1); opacity:1; }
+}
+.world-scene--movement-fade .world-scene__image--current {
+  animation: mensah-fade-out 520ms ease-in-out both !important;
+}
+.world-scene--movement-fade .world-scene__image--walk-target {
+  animation: mensah-fade-in 520ms ease-in-out both !important;
+}
+@keyframes mensah-fade-out {
+  0% { opacity:1; }
+  46%,100% { opacity:0; }
+}
+@keyframes mensah-fade-in {
+  0%,48% { opacity:0; }
+  100% { opacity:1; }
+}
+/* Visual black midpoint is provided by world-scene background. */
+.movement-test-selector {
+  position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+  z-index:90; padding:9px 12px 10px; background:rgba(19,18,16,.91);
+  color:#eee6d8; border:1px solid rgba(210,179,127,.45); border-radius:12px;
+  box-shadow:0 5px 24px #0008; backdrop-filter:blur(10px); max-width:calc(100vw - 18px);
+  font-family:Arial,sans-serif; text-align:center;
+}
+.movement-test-selector__title {display:block; font-size:9px; letter-spacing:.17em; margin-bottom:7px; color:#c9b28b;}
+.movement-test-selector__choices {display:flex; gap:5px; flex-wrap:wrap; justify-content:center;}
+.movement-test-selector button { border:1px solid #695c49; border-radius:7px; background:#292722;
+  color:#ece5d8; padding:8px 10px; font:12px Arial,sans-serif; cursor:pointer; white-space:nowrap; }
+.movement-test-selector button.is-selected {background:#9d815a; border-color:#d4bc91; color:#14120f; font-weight:bold;}
+.movement-test-selector button:focus-visible {outline:2px solid #f5d59d; outline-offset:2px;}
+.movement-test-selector button:disabled {opacity:.55; cursor:wait;}
+@media(max-width:480px) {.movement-test-selector {bottom:8px;} .movement-test-selector button {padding:7px 8px; font-size:11px;}}
+@media(prefers-reduced-motion:reduce) {
+  .world-scene--movement-fade .world-scene__image--current {animation:mensah-fade-out 180ms ease both !important;}
+  .world-scene--movement-fade .world-scene__image--walk-target {animation:mensah-fade-in 180ms ease both !important;}
+}
+
+/* OCT 2026 V6 — final cinematic viewpoint transition.
+   A single opaque curtain replaces all earlier competing image-plane animations.
+   The scene/view swaps while black; sound remains independent. */
+.world-scene__cinematic-curtain {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: auto;
+  background: #000;
+  opacity: 0;
+  will-change: opacity;
+  animation: mensah-cinematic-curtain var(--cinematic-total, 1100ms) linear both;
+}
+@keyframes mensah-cinematic-curtain {
+  /* 350 / 1100 = 31.818%; (350+300) / 1100 = 59.091% */
+  0% { opacity: 0; animation-timing-function: ease-in-out; }
+  31.818% { opacity: 1; }
+  59.091% { opacity: 1; animation-timing-function: ease-in-out; }
+  100% { opacity: 0; }
+}
+/* For reduced motion, play the shorter curtain with proportional keyframes. */
+@media (prefers-reduced-motion: reduce) {
+  .world-scene__cinematic-curtain {
+    animation-name: mensah-cinematic-curtain-reduced;
+  }
+  @keyframes mensah-cinematic-curtain-reduced {
+    0% { opacity: 0; }
+    30%,70% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+}
