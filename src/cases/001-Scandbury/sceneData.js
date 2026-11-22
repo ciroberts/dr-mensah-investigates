@@ -17,8 +17,9 @@ export const caseScenes = {
             id: "case-package",
             x: 49,
             y: 59,
-            label: "Case Package",
-            type: "visible",
+            label: "Inspect Case Brief",
+            type: "proximity",
+            radius: 100,
             targetSceneId: "case-package",
           },
           {
@@ -39,7 +40,6 @@ export const caseScenes = {
         alt: "Close view of the Mensah Investigations case package",
         focus: { x: 49, y: 58, scale: 1.85 },
         markers: [
-          { id: "return-desk-package", x: 50, y: 89, label: "Desk", type: "visible", targetSceneId: "desk-main" },
         ],
       },
       "office-photo": {
@@ -49,7 +49,6 @@ export const caseScenes = {
         alt: "Close view of a framed office photograph",
         focus: { x: 35, y: 22, scale: 2.25 },
         markers: [
-          { id: "return-desk-photo", x: 50, y: 89, label: "Desk", type: "visible", targetSceneId: "desk-main" },
         ],
       },
     },
@@ -61,6 +60,7 @@ export const caseScenes = {
     scenes: {
       exterior: {
         id: "exterior",
+        imageCoordinates: true,
         allowsWorldTravel: true,
         image: "/assets/scenes/001-scandbury-mansion/exterior-front-closed.png",
         alt: "Scandbury Mansion viewed from the street beyond its front gates",
@@ -128,7 +128,7 @@ export const caseScenes = {
             label: "Gate",
             type: "visible",
             targetSceneId: "gate-close",
-            transition: { type: "warp", surface: "pavement" },
+            transition: { type: "warp", direction: "backward", surface: "pavement" },
           },
         ],
       },
@@ -145,7 +145,7 @@ export const caseScenes = {
             label: "Gate",
             type: "visible",
             targetSceneId: "inside-gate",
-            transition: { type: "warp", surface: "pavement" },
+            transition: { type: "warp", direction: "backward", surface: "pavement" },
           },
         ],
       },
@@ -178,7 +178,7 @@ export const caseScenes = {
             label: "Roadside",
             type: "visible",
             targetSceneId: "exterior",
-            transition: { type: "warp", surface: "pavement" },
+            transition: { type: "warp", direction: "backward", surface: "pavement" },
           },
         ],
       },

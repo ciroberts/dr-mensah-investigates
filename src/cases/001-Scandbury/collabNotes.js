@@ -20,21 +20,7 @@ export const initialCollabNotes = [
     ],
     amaraNote: true,
   },
-  {
-    id: "case-001-household-contact",
-    createdBy: "Amara Okoye",
-    username: AMARA_HANDLE,
-    sharedWith: "Case 001 team",
-    time: "Before arrival",
-    title: "Scandbury Mansion",
-    subtitle: "Primary Household Contact",
-    content: [
-      "Amelia Scandbury — Edward Scandbury's wife.",
-      "Ask for Amelia on arrival at the mansion.",
-      "Amelia is associated with Scandbury Pharmacy."
-    ],
-    amaraNote: true,
-  },
+
 ];
 
 // Template/utility for later authored procedural events. The player's chosen

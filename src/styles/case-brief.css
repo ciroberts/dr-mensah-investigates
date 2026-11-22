@@ -182,7 +182,7 @@
         rotate(-2deg);
 }
 
-The important new trick is:
+/* Photograph edge treatment. */
 
 .photo-image {
     overflow: hidden;

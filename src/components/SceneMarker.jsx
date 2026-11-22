@@ -21,7 +21,8 @@ export default function SceneMarker({ marker, discovered, onDiscover, onActivate
     };
 
     window.addEventListener("pointermove", checkPointer, { passive: true });
-    return () => window.removeEventListener("pointermove", checkPointer);
+    window.addEventListener("pointerdown", checkPointer, { passive: true });
+    return () => { window.removeEventListener("pointermove", checkPointer); window.removeEventListener("pointerdown", checkPointer); };
   }, [marker.id, marker.radius, marker.type, discovered]);
 
   const visible = marker.type !== "proximity" || discovered || nearby;
@@ -50,7 +51,7 @@ export default function SceneMarker({ marker, discovered, onDiscover, onActivate
       style={{ left: `${marker.x}%`, top: `${marker.y}%` }}
       onPointerDown={handlePointerDown}
     >
-      <button type="button" className="scene-marker" aria-label={marker.label} tabIndex={visible ? 0 : -1} onClick={handleClick}>
+      <button type="button" className="scene-marker" aria-label={marker.label} tabIndex={0} onFocus={() => setNearby(true)} onBlur={() => { if (!discovered && marker.type === "proximity") setNearby(false); }} onClick={handleClick}>
         <span className="scene-marker__pulse" aria-hidden="true" />
         <span className="scene-marker__dot" aria-hidden="true" />
         <span className="scene-marker__label">{marker.label}</span>

@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import ReportInspection from "./components/documents/ReportInspection";
+import { scandburyIntakeReport } from "./cases/001-Scandbury/intakeReport";
+import { emptyProgress, readProgress, registerIntake, saveProgress } from "./state/caseProgress";
 import CaseBriefScreen from "./screens/CaseBriefScreen";
 import OrganizerScreen from "./screens/OrganizerScreen";
 import InvestigationScene from "./scenes/InvestigationScene";
@@ -9,6 +12,18 @@ import { INITIAL_LOCATION_ID, INITIAL_SCENE_ID, getLocation, getScene } from "./
 import "./styles/organizer-transition.css";
 import "./styles/scenes.css";
 
+// Decode before animating so the handover never reveals an unloaded image.
+async function prepareSceneImage(src) {
+  if (!src) return;
+  const image = new Image();
+  image.src = src;
+  let timeout;
+  try {
+    await Promise.race([image.decode(), new Promise((_, reject) => {
+      timeout = setTimeout(() => reject(new Error("Image load timed out")), 10000);
+    })]);
+  } finally { clearTimeout(timeout); }
+}
 const CLOSED_IMAGE = "/assets/organizer/organizer-closed.webp";
 const ANIMATION_MS = 650;
 const TRAVEL_FADE_OUT_MS = 650;
@@ -69,14 +84,23 @@ function clampHud(position) {
 }
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState("brief");
-  const [currentLocationId, setCurrentLocationId] = useState(INITIAL_LOCATION_ID);
-  const [currentSceneId, setCurrentSceneId] = useState(INITIAL_SCENE_ID);
-  const [currentViewId, setCurrentViewId] = useState(null);
+  const navigationPending = useRef(false);
+  const inspectionHistory = useRef([]);
+  const [canInspectBack, setCanInspectBack] = useState(false);
+  const [navigationMessage, setNavigationMessage] = useState("");
+  const [progress, setProgress] = useState(() => {
+    try { return readProgress(window.localStorage); } catch { return emptyProgress(); }
+  });
+  const [currentScreen, setCurrentScreen] = useState(progress.openingRead ? "investigation" : "brief");
+  const [reportInspection, setReportInspection] = useState(null);
+  const [saveFailed, setSaveFailed] = useState(false);
+  const [currentLocationId, setCurrentLocationId] = useState(getScene(progress.locationId, progress.sceneId) ? progress.locationId : INITIAL_LOCATION_ID);
+  const [currentSceneId, setCurrentSceneId] = useState(getScene(progress.locationId, progress.sceneId) && !["case-package", "office-photo"].includes(progress.sceneId) ? progress.sceneId : INITIAL_SCENE_ID);
+  const [currentViewId, setCurrentViewId] = useState(progress.viewId || null);
   const [lookTransition, setLookTransition] = useState(null);
   const [movementTransition, setMovementTransition] = useState(null);
-  const [discoveredMarkers, setDiscoveredMarkers] = useState(() => new Set());
-  const [organizerOpen, setOrganizerOpen] = useState(true);
+  const [discoveredMarkers, setDiscoveredMarkers] = useState(() => new Set(Array.isArray(progress.discoveredMarkers) ? progress.discoveredMarkers : []));
+  const [organizerOpen, setOrganizerOpen] = useState(false);
   const [transition, setTransition] = useState("idle");
   const [hudPosition, setHudPosition] = useState({ x: 0.955, y: 0.84 });
   const [travelCurtainVisible, setTravelCurtainVisible] = useState(false);
@@ -112,6 +136,36 @@ export default function App() {
     return () => window.removeEventListener("resize", keepHudVisible);
   }, []);
 
+  useEffect(() => {
+    try {
+      setSaveFailed(!saveProgress(window.localStorage, {
+        ...progress, locationId: currentLocationId, sceneId: currentSceneId,
+        viewId: currentViewId, discoveredMarkers: [...discoveredMarkers],
+      }));
+    } catch { setSaveFailed(true); }
+  }, [progress, currentLocationId, currentSceneId, currentViewId, discoveredMarkers]);
+
+  useEffect(() => {
+    if (currentLocationId !== "investigator-desk" || currentSceneId !== "case-package") return;
+    // Let the established 520ms focus zoom settle before presenting crisp document text.
+    const reportTimer = setTimeout(() => setReportInspection({
+      source: "desk", report: progress.documents[scandburyIntakeReport.id] || scandburyIntakeReport,
+    }), 520);
+    return () => clearTimeout(reportTimer);
+  }, [currentLocationId, currentSceneId, progress.documents]);
+
+  const beginAssignment = () => {
+    if (travelActive) return;
+    setTravelActive(true);
+    setTravelCurtainVisible(true);
+    travelTimers.current.push(setTimeout(() => {
+      setProgress((current) => ({ ...current, openingRead: true }));
+      setCurrentScreen("investigation");
+      setTravelCurtainVisible(false);
+      travelTimers.current.push(setTimeout(() => setTravelActive(false), TRAVEL_FADE_IN_MS));
+    }, TRAVEL_FADE_OUT_MS));
+  };
+
   const closeOrganizer = () => {
     if (transition !== "idle" || !organizerOpen || travelActive) return;
     setTransition("closing");
@@ -123,7 +177,7 @@ export default function App() {
   };
 
   const openOrganizer = () => {
-    if (transition !== "idle" || organizerOpen || travelActive) return;
+    if (transition !== "idle" || organizerOpen || travelActive || navigationPending.current || movementTransition || lookTransition) return;
     setTransition("opening");
     clearTimeout(timer.current);
     timer.current = setTimeout(() => {
@@ -134,7 +188,7 @@ export default function App() {
 
   const handleTravel = (locationId, arrivalPoint) => {
     const destination = getLocation(locationId);
-    if (!destination || travelActive) return;
+    if (!destination || travelActive || navigationPending.current || movementTransition || lookTransition || !progress.discoveredLocationIds.includes(locationId)) return;
 
     const destinationSceneId = arrivalPoint?.sceneId || destination.initialSceneId;
     const destinationScene = getScene(destination.id, destinationSceneId);
@@ -144,6 +198,8 @@ export default function App() {
     // Do not replay the fade/title sequence or fake a journey.
     if (destination.id === currentLocationId && destinationSceneId === currentSceneId) return;
 
+    inspectionHistory.current = [];
+    setCanInspectBack(false);
     travelTimers.current.forEach(clearTimeout);
     travelTimers.current = [];
     setLocationTitle(null);
@@ -184,16 +240,26 @@ export default function App() {
     });
   };
 
-  const activateSceneMarker = (marker) => {
-    // Temporary gate-state preview; keeps physical position unchanged.
-    if (marker.id === "scandbury-intercom-front") {
-      setCurrentViewId("front-open");
+  const activateSceneMarker = async (marker) => {
+    if (navigationPending.current || movementTransition || lookTransition || travelActive) return;
+    if (!marker.targetSceneId && marker.id === "scandbury-intercom-front") { setCurrentViewId("front-open"); return; }
+    if (!marker.targetSceneId && marker.id === "scandbury-intercom-open") { setCurrentViewId("front"); return; }
+    if (marker.id === "scandbury-intercom") {
+      setNavigationMessage("Call button pressed. Intercom dialogue is not connected yet.");
       return;
     }
-    if (marker.id === "scandbury-intercom-open") {
-      setCurrentViewId("front");
-      return;
+    if (marker.action === "inspection-back") {
+      const previous = inspectionHistory.current.at(-1);
+      if (!previous || previous.locationId !== currentLocationId) return;
+      marker = { ...marker, targetSceneId: previous.sceneId, targetViewId: previous.viewId,
+        transition: { type: "inspect", direction: "backward" }, returning: true };
     }
+    const commitInspectionHistory = () => {
+      if (marker.returning) inspectionHistory.current.pop();
+      else inspectionHistory.current.push({ locationId: currentLocationId, sceneId: currentSceneId, viewId: currentViewId });
+      setCanInspectBack(inspectionHistory.current.length > 0);
+    };
+    setNavigationMessage("");
     if (!marker.targetSceneId || movementTransition || lookTransition || travelActive || focusTimers.current.length) return;
     const nextScene = getScene(currentLocationId, marker.targetSceneId);
     const currentScene = getScene(currentLocationId, currentSceneId);
@@ -204,11 +270,40 @@ export default function App() {
       // Sound starts on activation; visuals follow just behind it so the
       // mechanical cue leads the lens movement rather than chasing it.
       playEffect(nextScene.focus ? FOCUS_SOUND_IN : FOCUS_SOUND_OUT, nextScene.focus ? 0.52 : 0.46);
+      navigationPending.current = true;
       focusTimers.current.push(setTimeout(() => {
+        commitInspectionHistory();
+        navigationPending.current = false;
         setCurrentSceneId(marker.targetSceneId);
-        setCurrentViewId(nextScene.initialViewId || null);
+        setCurrentViewId(marker.targetViewId ?? nextScene.initialViewId ?? null);
         focusTimers.current = [];
       }, FOCUS_AUDIO_LEAD_MS));
+      return;
+    }
+
+    // Inspect a separate high-detail plate; retain the view we approached from.
+    if (marker.transition?.type === "inspect") {
+      const returning = Boolean(marker.returning);
+      const targetViewId = marker.targetViewId ?? nextScene.initialViewId ?? null;
+      const targetImage = nextScene.views?.[targetViewId]?.image || nextScene.image;
+      navigationPending.current = true;
+      setNavigationMessage("Loading view…");
+      try { await prepareSceneImage(targetImage); }
+      catch { navigationPending.current = false; setNavigationMessage("Could not load this view. Please try again."); return; }
+      setNavigationMessage("");
+      const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+      const duration = reduced ? 180 : 340;
+      playEffect(returning ? FOCUS_SOUND_OUT : FOCUS_SOUND_IN, 0.46);
+      setMovementTransition({ type: reduced ? "inspect-fade" : returning ? "inspect-out" : "inspect-in", targetImage, duration,
+        originX: marker.transition.originX ?? 50, originY: marker.transition.originY ?? 54 });
+      movementTimers.current.push(setTimeout(() => {
+        commitInspectionHistory();
+        setCurrentSceneId(marker.targetSceneId);
+        setCurrentViewId(targetViewId);
+        setMovementTransition(null);
+        navigationPending.current = false;
+        movementTimers.current = [];
+      }, duration));
       return;
     }
 
@@ -217,6 +312,28 @@ export default function App() {
     if (motion !== "warp" && motion !== "walk") {
       setCurrentSceneId(marker.targetSceneId);
       setCurrentViewId(nextScene.initialViewId || null);
+      return;
+    }
+
+    if (!window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) {
+      navigationPending.current = true;
+      setNavigationMessage("Loading view…");
+      const targetImage = nextScene.views?.[nextScene.initialViewId]?.image || nextScene.image;
+      try { await prepareSceneImage(targetImage); }
+      catch { navigationPending.current = false; setNavigationMessage("Could not load this view. Please try again."); return; }
+      setNavigationMessage("");
+      const duration = 620;
+      setMovementTransition({ type: marker.transition?.direction === "backward" ? "pull" : "push", targetImage, duration,
+        originX: marker.transition?.originX ?? 50, originY: marker.transition?.originY ?? 54 });
+      const footstep = FOOTSTEP_VARIANTS[marker.transition?.surface] || FOOTSTEP_VARIANTS.pavement;
+      movementTimers.current.push(setTimeout(() => playEffect(footstep, 0.37), 120));
+      movementTimers.current.push(setTimeout(() => {
+        setCurrentSceneId(marker.targetSceneId);
+        setCurrentViewId(nextScene.initialViewId || null);
+        setMovementTransition(null);
+        navigationPending.current = false;
+        movementTimers.current = [];
+      }, duration));
       return;
     }
 
@@ -252,10 +369,26 @@ export default function App() {
     image.src = targetImage;
   };
 
-  const handleLook = (direction, targetViewId) => {
-    if (!targetViewId || movementTransition || lookTransition || travelActive || organizerVisible) return;
+  const handleLook = async (direction, targetViewId) => {
+    if (navigationPending.current || reportInspection || !targetViewId || movementTransition || lookTransition || travelActive || organizerVisible) return;
     const currentScene = getScene(currentLocationId, currentSceneId);
     if (!currentScene?.views?.[targetViewId]) return;
+
+    if (!window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) {
+      navigationPending.current = true;
+      setNavigationMessage("Loading view…");
+      try { await prepareSceneImage(currentScene.views[targetViewId].image); }
+      catch { navigationPending.current = false; setNavigationMessage("Could not load this view. Please try again."); return; }
+      setNavigationMessage("");
+      setLookTransition({ direction, targetViewId });
+      lookTimers.current.push(setTimeout(() => {
+        setCurrentViewId(targetViewId);
+        setLookTransition(null);
+        navigationPending.current = false;
+        lookTimers.current = [];
+      }, 340));
+      return;
+    }
 
     movementTimers.current.forEach(clearTimeout);
     movementTimers.current = [];
@@ -295,16 +428,14 @@ export default function App() {
   const onHudPointerUp = () => { drag.current = null; };
   const onHudPointerCancel = () => { drag.current = null; };
 
-  if (currentScreen === "brief") {
-    return <CaseBriefScreen onBeginInvestigation={() => setCurrentScreen("investigation")} />;
-  }
-
   const scene = getScene(currentLocationId, currentSceneId);
   const organizerVisible = organizerOpen && transition !== "closing";
   const canWorldTravel = Boolean(scene?.allowsWorldTravel);
 
   return (
-    <div className="investigation-shell">
+    <>
+    {currentScreen === "brief" && <CaseBriefScreen onBeginInvestigation={beginAssignment} />}
+    {currentScreen === "investigation" && <div className="investigation-shell">
       <div className={`investigation-world${organizerVisible ? " investigation-world--organizer-open" : ""}`}>
         <InvestigationScene
           scene={scene}
@@ -316,6 +447,8 @@ export default function App() {
           discoveredMarkers={discoveredMarkers}
           onDiscoverMarker={discoverMarker}
           onMarkerActivate={activateSceneMarker}
+          canGoBack={canInspectBack}
+          onBack={() => activateSceneMarker({ action: "inspection-back" })}
         />
       </div>
 
@@ -328,6 +461,9 @@ export default function App() {
           currentLocationId={currentLocationId}
           currentSceneId={currentSceneId}
           onUnreadChange={setOrganizerUnread}
+          documents={Object.values(progress.documents)}
+          discoveredLocationIds={progress.discoveredLocationIds}
+          onInspectDocument={(report) => setReportInspection({ source: "organizer", report })}
         />
       </div>
 
@@ -357,13 +493,27 @@ export default function App() {
         <LocationTitle key={`${locationTitle.title}-${currentSceneId}`} {...locationTitle} />
       )}
 
-      <div
-        className={`travel-curtain${travelCurtainVisible ? " travel-curtain--visible" : ""}`}
-        aria-hidden="true"
-      />
 
 
+
+      {reportInspection && <ReportInspection
+        report={reportInspection.report}
+        fromDesk={reportInspection.source === "desk"}
+        onClose={() => {
+          const fromDesk = reportInspection.source === "desk";
+          setReportInspection(null);
+          if (fromDesk) {
+            setProgress((current) => registerIntake(current, scandburyIntakeReport, "scandbury-mansion"));
+            activateSceneMarker({ action: "inspection-back" });
+          }
+        }}
+      />}
+      {saveFailed && <p className="progress-save-notice" role="status">Local saving is unavailable. Case records remain available for this session, but may not survive a reload.</p>}
+      {navigationMessage && <div className="transition-status" role="status">{navigationMessage}</div>}
       <MeaningfulAudioIndicator active={meaningfulAudio.active} firstUse={meaningfulAudio.firstUse} />
-    </div>
+    </div>}
+    {/* Keep one curtain mounted across the letter/desk boundary so both fades run. */}
+    <div className={`travel-curtain${travelCurtainVisible ? " travel-curtain--visible" : ""}`} aria-hidden="true" />
+    </>
   );
 }
