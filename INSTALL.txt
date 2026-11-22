@@ -1,0 +1,28 @@
+MENSAH — INSPECTION AND PEAR REFINEMENTS
+
+Extract into your existing project root and merge src and public, replacing
+matching files. No previous large mansion update ZIP is required. Your existing
+project, package.json and original public assets/audio/video remain necessary.
+Run your usual npm run dev and hard-refresh the browser.
+
+Includes:
+- Shared bottom Back button for desk picture, case pouch and intercom inspections.
+  Returns one inspection level, preserving the entry scene and viewing direction.
+- Intercom inspect/call dots revealed within a 160 CSS-pixel pointer/touch radius;
+  keyboard focus also reveals them. Activated dots remain discovered this session.
+- Removes fake interview, pharmacy/hatch and deed notes; keeps only initial brief.
+- Map zoom-in at regional/neighbourhood levels; current-position overlay no longer
+  blocks clicks. Current property's arrival points are reference-only.
+- Messaging serializes replies per contact, preserves eligibility restrictions,
+  marks incoming messages unread when the conversation is hidden, and removes
+  finished timers from the active timer list.
+- Retains existing five-second gold spark/line location-title reveal on arrival.
+- Includes five optimized WebP scene images and the front foliage mask. Existing
+  ambient video remains in use; no video duplicated in this small download.
+
+Intercom conversation is still a placeholder. Answering character and dialogue
+must be authored before the complete entry interaction can be implemented.
+
+Checks: source syntax, image paths and scene targets; simulated App state tests
+for intercom left-view return and desk pouch Back. Full browser walkthrough and
+production build not run: the supplied project lacks package/entry files.

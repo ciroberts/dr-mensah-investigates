@@ -39,7 +39,6 @@ export const caseScenes = {
         alt: "Close view of the Mensah Investigations case package",
         focus: { x: 49, y: 58, scale: 1.85 },
         markers: [
-          { id: "return-desk-package", x: 50, y: 89, label: "Desk", type: "visible", targetSceneId: "desk-main" },
         ],
       },
       "office-photo": {
@@ -49,7 +48,6 @@ export const caseScenes = {
         alt: "Close view of a framed office photograph",
         focus: { x: 35, y: 22, scale: 2.25 },
         markers: [
-          { id: "return-desk-photo", x: 50, y: 89, label: "Desk", type: "visible", targetSceneId: "desk-main" },
         ],
       },
     },
@@ -61,8 +59,9 @@ export const caseScenes = {
     scenes: {
       exterior: {
         id: "exterior",
+        imageCoordinates: true,
         allowsWorldTravel: true,
-        image: "/assets/scenes/001-scandbury-mansion/exterior-front-closed.png",
+        image: "/assets/scenes/001-scandbury-mansion/exterior-front-closed.webp",
         alt: "Scandbury Mansion viewed from the street beyond its front gates",
         locationTitle: {
           title: "SCANDBURY MANSION",
@@ -71,34 +70,40 @@ export const caseScenes = {
         views: {
           front: {
             id: "front",
-            image: "/assets/scenes/001-scandbury-mansion/exterior-front-closed.png",
+            image: "/assets/scenes/001-scandbury-mansion/exterior-front-closed.webp",
             alt: "Scandbury Mansion viewed from the street beyond its front gates",
             look: { left: "left", right: "right" },
+            atmosphere: {
+              motionPlate: {
+                src: "/assets/scenes/001-scandbury-mansion/scandbury-front-motion.mp4",
+                opacity: 0.34,
+                maskImage: "/assets/scenes/001-scandbury-mansion/front-foliage-mask.svg",
+              },
+            },
             markers: [
-              { id: "scandbury-intercom-front", x: 38.8, y: 67.5, label: "Intercom", type: "visible" },
-              { id: "scandbury-gate", x: 50, y: 61, label: "Gate", type: "visible", targetSceneId: "gate-close", transition: { type: "warp", surface: "pavement" } },
+              { id: "scandbury-intercom-front", x: 38.9, y: 61.7, label: "Inspect Intercom", type: "proximity", radius: 160, targetSceneId: "gate-close", transition: { type: "inspect", originX: 38.9, originY: 61.7 } },
             ],
           },
           left: {
             id: "left",
-            image: "/assets/scenes/001-scandbury-mansion/exterior-left.png",
+            image: "/assets/scenes/001-scandbury-mansion/exterior-left.webp",
             alt: "The road and western boundary of Scandbury Mansion viewed from the same roadside position",
             look: { right: "front" },
+            markers: [],
           },
           right: {
             id: "right",
-            image: "/assets/scenes/001-scandbury-mansion/exterior-right.png",
+            image: "/assets/scenes/001-scandbury-mansion/exterior-right.webp",
             alt: "The road and eastern boundary of Scandbury Mansion from the roadside",
             look: { left: "front" },
           },
           "front-open": {
             id: "front-open",
-            image: "/assets/scenes/001-scandbury-mansion/exterior-front-open.png",
+            image: "/assets/scenes/001-scandbury-mansion/exterior-front-open.webp",
             alt: "Scandbury Mansion viewed from the roadside with the front gates open",
             look: { left: "left", right: "right" },
             markers: [
-              { id: "scandbury-intercom-open", x: 38.8, y: 67.5, label: "Intercom", type: "visible" },
-              { id: "scandbury-courtyard-open", x: 50, y: 58, label: "Courtyard", type: "visible", targetSceneId: "inside-gate", transition: { type: "warp", surface: "pavement" } },
+              { id: "scandbury-intercom-open", x: 38.9, y: 61.7, label: "Inspect Intercom", type: "proximity", radius: 160, targetSceneId: "gate-close", transition: { type: "inspect", originX: 38.9, originY: 61.7 } },
             ],
           },
         },
@@ -128,7 +133,7 @@ export const caseScenes = {
             label: "Gate",
             type: "visible",
             targetSceneId: "gate-close",
-            transition: { type: "warp", surface: "pavement" },
+            transition: { type: "warp", direction: "backward", surface: "pavement" },
           },
         ],
       },
@@ -145,41 +150,26 @@ export const caseScenes = {
             label: "Gate",
             type: "visible",
             targetSceneId: "inside-gate",
-            transition: { type: "warp", surface: "pavement" },
+            transition: { type: "warp", direction: "backward", surface: "pavement" },
           },
         ],
       },
       "gate-close": {
         id: "gate-close",
-        allowsWorldTravel: true,
-        image: "/assets/scenes/001-scandbury-mansion/gate-close.webp",
-        alt: "Scandbury Mansion front gate viewed at close range",
+        imageCoordinates: true,
+        allowsWorldTravel: false,
+        image: "/assets/scenes/001-scandbury-mansion/intercom-close.webp",
+        alt: "Bronze intercom beneath the lantern on the left entrance post",
         markers: [
           {
             id: "scandbury-intercom",
-            x: 20,
-            y: 55,
-            label: "Intercom",
-            type: "visible",
+            x: 49.4,
+            y: 63.2,
+            label: "Press Call Button",
+            type: "proximity",
+            radius: 160,
           },
-          {
-            id: "perspective-walk-test",
-            x: 50,
-            y: 36,
-            label: "Courtyard",
-            type: "visible",
-            targetSceneId: "inside-gate",
-            transition: { type: "warp", surface: "pavement" },
-          },
-          {
-            id: "return-roadside",
-            x: 50,
-            y: 90,
-            label: "Roadside",
-            type: "visible",
-            targetSceneId: "exterior",
-            transition: { type: "warp", surface: "pavement" },
-          },
+
         ],
       },
     },

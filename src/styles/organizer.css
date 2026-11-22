@@ -1392,7 +1392,7 @@
   width: 34px;
   height: 34px;
   transform: translate(-50%, -50%);
-  pointer-events: auto;
+  pointer-events: none;
 }
 .map-player-position__dot,
 .map-player-position__pulse {

@@ -20,7 +20,7 @@ const initialThreads = {
   mensah: [],
 };
 
-export function useCommunications({ knownFacts = [], locationId } = {}) {
+export function useCommunications({ knownFacts = [], locationId, messagesVisible = false } = {}) {
   const [threads, setThreads] = useState(initialThreads);
   const [selectedContactId, setSelectedContactId] = useState("amara");
   const [contactPressure, setContactPressure] = useState({ amara: 0, mensah: 0 });
@@ -32,12 +32,17 @@ export function useCommunications({ knownFacts = [], locationId } = {}) {
   const [recentlyBadgered, setRecentlyBadgered] = useState({ amara: false, mensah: false });
   const [notice, setNotice] = useState("");
   const timers = useRef([]);
+  const pending = useRef(new Set());
+  const [pendingContacts, setPendingContacts] = useState([]);
+  const messagesVisibleRef = useRef(messagesVisible);
+  messagesVisibleRef.current = messagesVisible;
+  const finishResponse = (contactId) => { pending.current.delete(contactId); setPendingContacts([...pending.current]); };
   const selectedContactRef = useRef(selectedContactId);
 
   useEffect(() => { selectedContactRef.current = selectedContactId; }, [selectedContactId]);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
   const later = (fn, delay) => {
-    const timer = setTimeout(fn, delay);
+    const timer = setTimeout(() => { timers.current = timers.current.filter((id) => id !== timer); fn(); }, delay);
     timers.current.push(timer);
     return timer;
   };
@@ -59,7 +64,16 @@ export function useCommunications({ knownFacts = [], locationId } = {}) {
     [contactId]: current[contactId].map((message) => ({ ...message, unread: false })),
   }));
   const markNotesRead = () => setUnreadNotes(0);
-  const selectContact = (contactId) => { setSelectedContactId(contactId); markThreadRead(contactId); setNotice(""); };
+  const selectContact = (contactId) => {
+    if (!characterProfiles[contactId]) return;
+    selectedContactRef.current = contactId;
+    setSelectedContactId(contactId);
+    if (messagesVisibleRef.current) markThreadRead(contactId);
+    setNotice("");
+  };
+  useEffect(() => {
+    if (messagesVisible) markThreadRead(selectedContactId);
+  }, [messagesVisible, selectedContactId]);
 
   const suggestions = scandburyCommunications.suggestions.filter((suggestion) => {
     if (suggestion.contact !== selectedContactId) return false;
@@ -74,7 +88,7 @@ export function useCommunications({ knownFacts = [], locationId } = {}) {
     if (!text.length) return;
     setThreads((current) => ({
       ...current,
-      [contactId]: [...current[contactId], { id: `${response.id}-${Date.now()}`, from: contactId, receivedAt, unread: selectedContactRef.current !== contactId, text }],
+      [contactId]: [...current[contactId], { id: `${response.id}-${Date.now()}`, from: contactId, receivedAt, unread: !messagesVisibleRef.current || selectedContactRef.current !== contactId, text }],
     }));
   };
 
@@ -102,6 +116,8 @@ export function useCommunications({ knownFacts = [], locationId } = {}) {
 
   const sendSuggestion = (suggestion) => {
     const contactId = selectedContactId;
+    if (!suggestions.some((item) => item.id === suggestion?.id)) return;
+    if (pending.current.has(contactId)) { setNotice("Wait for the current reply before sending another message."); return; }
     if (isDnd(contactId)) {
       setNotice(`${characterProfiles[contactId].handle} is in Do Not Disturb mode. Message not transmitted.`);
       return;
@@ -118,12 +134,14 @@ export function useCommunications({ knownFacts = [], locationId } = {}) {
       if (response.requiresFacts?.some((fact) => !knownFacts.includes(fact))) return false;
       if ((response.minPressure ?? 0) > nextPressure) return false;
       if (response.maxPressure != null && nextPressure > response.maxPressure) return false;
-      if (recentResponseIds.includes(response.id)) return false;
       return true;
     });
-    const fallback = scandburyCommunications.responses.filter((response) => response.contact === contactId && response.intent === suggestion.intent);
-    const response = pick(eligible.length ? eligible : fallback);
-    const messageId = `player-${Date.now()}`;
+    const fresh = eligible.filter((response) => !recentResponseIds.includes(response.id));
+    const response = pick(fresh.length ? fresh : eligible);
+    if (!response) { setNotice("No response is available for that topic right now."); return; }
+    pending.current.add(contactId);
+    setPendingContacts([...pending.current]);
+    const messageId = `player-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
     setThreads((current) => ({ ...current, [contactId]: [...current[contactId], { id: messageId, from: "player", sentAt: clock(), readAt: null, unread: false, text: [suggestion.text] }] }));
     setContactPressure((current) => ({ ...current, [contactId]: nextPressure }));
@@ -136,6 +154,7 @@ export function useCommunications({ knownFacts = [], locationId } = {}) {
     later(() => {
       setThreads((current) => ({ ...current, [contactId]: current[contactId].map((message) => message.id === messageId ? { ...message, readAt: clock() } : message) }));
       if (response.readOnly) {
+        finishResponse(contactId);
         if (nextPressure >= (response.dndAtPressure ?? 7)) later(() => enterPressureDnd(contactId), response.dndDelay ?? 1800);
         return;
       }
@@ -143,6 +162,7 @@ export function useCommunications({ knownFacts = [], locationId } = {}) {
       later(() => performTypingSequence(contactId, response, () => {
         const recoveryLine = recentlyBadgered[contactId] ? pick(profile.phrasePools.afterBadgering) : null;
         addIncoming(contactId, response, recoveryLine ? [recoveryLine] : []);
+        finishResponse(contactId);
         if (recoveryLine) setRecentlyBadgered((current) => ({ ...current, [contactId]: false }));
         if (response.enterDnd || nextPressure >= 8) later(() => enterPressureDnd(contactId), response.dndDelay ?? 700);
       }), thinkDelay);
@@ -160,6 +180,6 @@ export function useCommunications({ knownFacts = [], locationId } = {}) {
   return {
     contacts, threads, selectedContactId, selectContact, suggestions, sendSuggestion,
     unreadByContact, unreadMessages, unreadNotes, totalUnread, markNotesRead,
-    contactPressure, typing, notice, reactToCriticalEvent,
+    contactPressure, typing, notice, reactToCriticalEvent, pendingContacts,
   };
 }

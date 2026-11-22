@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { initialCollabNotes } from "../cases/001-Scandbury/collabNotes.js";
 import { useCommunications } from "../communications/useCommunications.js";
 import "../styles/organizer.css";
 
@@ -9,75 +10,7 @@ import { caseMap, mapRegions, mapLocations } from "../cases/001-Scandbury/mapDat
    COLLAB NOTES DATA
 ========================================================= */
 
-const notebookPages = [
-  {
-    id: 1,
-    createdBy: "Investigator",
-    username: "Investigator",
-    sharedWith: "sweetmara88 · mrinvestigator01",
-    time: "Case 001",
-    title: "Scandbury Mansion",
-    subtitle: "Initial Investigation",
-    content: [
-      "Edward Scandbury, 67, disappeared from his estate four days ago.",
-      "No signs of forced entry have been reported.",
-      "No ransom demand has been received.",
-      "Scandbury Mansion is currently the primary known location."
-    ]
-  },
-
-  {
-    id: 2,
-    createdBy: "Investigator",
-    username: "Investigator",
-    sharedWith: "sweetmara88 · mrinvestigator01",
-    time: "10:14 AM",
-    title: "Mrs. Clarke",
-    subtitle: "Housekeeper — Scandbury Mansion",
-    content: [
-      "Spoke with Mrs. Clarke in the main kitchen.",
-      "Grey work uniform. Appeared tired and somewhat guarded.",
-      "She says she last saw Mr. Scandbury Tuesday evening.",
-      "Heard raised voices upstairs shortly before 8 PM.",
-      "Saw an unfamiliar red car near the eastern drive.",
-      "She became noticeably uncomfortable when asked about Thomas Scandbury."
-    ]
-  },
-
-  {
-    id: 3,
-    createdBy: "Investigator",
-    username: "Investigator",
-    sharedWith: "sweetmara88 · mrinvestigator01",
-    time: "12:07 PM",
-    title: "Scandbury Pharmacy",
-    subtitle: "Field Observation",
-    content: [
-      "Found a strange hatch door behind shelving near the rear storeroom.",
-      "Cleaner says the hatch has been there for years but claims nobody uses it.",
-      "No obvious handle on the visible side.",
-      "Needs investigating further."
-    ],
-    sketch: true
-  },
-
-  {
-    id: 4,
-    createdBy: "Amara Okoye",
-    username: "sweetmara88",
-    sharedWith: "Investigator · mrinvestigator01",
-    time: "2:32 PM",
-    title: "Property Deed",
-    subtitle: "Scandbury Pharmacy",
-    content: [
-      "I checked the property registry.",
-      "The pharmacy property is registered to Scandbury Holdings Ltd.",
-      "Transfer date: March 14, 2018.",
-      "I added the deed details here so you have them with the rest of the case notes."
-    ],
-    amaraNote: true
-  }
-];
+const notebookPages = initialCollabNotes;
 
 
 export default function OrganizerScreen({ onTravel, onClose, isVisible = true, canWorldTravel = false, currentLocationId, currentSceneId, onUnreadChange }) {
@@ -136,6 +69,7 @@ export default function OrganizerScreen({ onTravel, onClose, isVisible = true, c
   const [arrivalMenuOpen, setArrivalMenuOpen] = useState(false);
   const communications = useCommunications({
     locationId: currentLocationId,
+    messagesVisible: isVisible && pearApp === "messages",
     knownFacts: [],
   });
   const messageHistoryRef = useRef(null);
@@ -186,8 +120,8 @@ export default function OrganizerScreen({ onTravel, onClose, isVisible = true, c
   }, [communications.totalUnread, onUnreadChange]);
 
   useEffect(() => {
-    if (page?.amaraNote) communications.markNotesRead();
-  }, [page?.id]);
+    if (isVisible && page?.amaraNote) communications.markNotesRead();
+  }, [page?.id, isVisible]);
 
   const [mapLevel, setMapLevel] = useState("regional");
   const [mapDebug] = useState(false); // Turn on temporarily only while calibrating authored regional boundaries.
@@ -266,7 +200,7 @@ export default function OrganizerScreen({ onTravel, onClose, isVisible = true, c
   ) ?? [];
 
   const handleTravelPoint = () => {
-    if (!canWorldTravel || !selectedLocation || availableArrivalPoints.length === 0) return;
+    if (!canWorldTravel || !selectedLocation || selectedLocation.id === currentLocationId || availableArrivalPoints.length === 0) return;
     if (availableArrivalPoints.length === 1) {
       onTravel?.(selectedLocation.id, availableArrivalPoints[0]);
       return;
@@ -275,6 +209,7 @@ export default function OrganizerScreen({ onTravel, onClose, isVisible = true, c
   };
 
   const chooseArrivalPoint = (point) => {
+    if (!canWorldTravel || selectedLocation?.id === currentLocationId || !point.travelAccessible) return;
     onTravel?.(selectedLocation.id, point);
   };
 
@@ -553,7 +488,7 @@ export default function OrganizerScreen({ onTravel, onClose, isVisible = true, c
                       <small>Suggested from current case context and synchronized Collab*Notes.</small>
                       <div className="assisted-suggestions">
                         {communications.suggestions.map((suggestion) => (
-                          <button type="button" key={suggestion.id} onClick={() => communications.sendSuggestion(suggestion)}>
+                          <button type="button" key={suggestion.id} disabled={communications.pendingContacts.includes(communications.selectedContactId)} onClick={() => communications.sendSuggestion(suggestion)}>
                             {suggestion.text}
                           </button>
                         ))}
@@ -691,7 +626,7 @@ export default function OrganizerScreen({ onTravel, onClose, isVisible = true, c
                     {(selectedLocation.arrivalPoints ?? [])
                       .filter((point) => point.discovered && point.position)
                       .map((point) => {
-                        const actionable = canWorldTravel && point.travelAccessible;
+                        const actionable = canWorldTravel && point.travelAccessible && selectedLocation.id !== currentLocationId;
                         if (!actionable) {
                           return (
                             <div
@@ -742,8 +677,13 @@ export default function OrganizerScreen({ onTravel, onClose, isVisible = true, c
                   <span>↑</span>
                 </div>
 
-                {mapLevel !== "regional" && (
+                {(
                   <div className="map-zoom-controls">
+                    {mapLevel !== "property" && <button type="button" aria-label="Zoom in" title="Zoom in" onClick={() => {
+                      if (mapLevel === "regional") openRegion(selectedRegionId || currentMapLocation?.regionId || Object.keys(mapRegions)[0]);
+                      else { const destination = mapLocations.find((location) => location.discovered && location.regionId === selectedRegionId && location.propertyImage); if (destination) openLocation(destination); }
+                    }}>+</button>}
+                    {mapLevel !== "regional" &&
                     <button
                       type="button"
                       onClick={goMapBack}
@@ -755,6 +695,7 @@ export default function OrganizerScreen({ onTravel, onClose, isVisible = true, c
                         <path d="M16 16l5 5M7.8 10.8h6" />
                       </svg>
                     </button>
+                    }
                   </div>
                 )}
               </div>
