@@ -1091,3 +1091,111 @@
     100% { opacity: 0; }
   }
 }
+
+/* Directional experiment: destination below the departing photograph.
+   Kept last to override the archived V3–V6 experiments above. */
+.world-scene--movement-push .world-scene__image--current,
+.world-scene--movement-pull .world-scene__image--current {
+  position: relative;
+  z-index: 4;
+  transform-origin: var(--motion-origin-x) var(--motion-origin-y);
+  animation: mensah-direction-forward-out var(--motion-duration) linear both !important;
+}
+.world-scene--movement-push .world-scene__image--walk-target,
+.world-scene--movement-pull .world-scene__image--walk-target {
+  z-index: 3;
+  opacity: 1;
+  transform-origin: var(--motion-origin-x) var(--motion-origin-y);
+  animation: mensah-direction-forward-in var(--motion-duration) cubic-bezier(.18,.6,.25,1) both !important;
+}
+.world-scene--movement-pull .world-scene__image--current { animation-name: mensah-direction-back-out !important; }
+.world-scene--movement-pull .world-scene__image--walk-target { animation-name: mensah-direction-back-in !important; }
+@keyframes mensah-direction-forward-out {
+  0% { transform: scale(1); opacity: 1; filter: blur(0); }
+  25% { transform: scale(1.07,1.10); opacity: 1; filter: blur(.6px); }
+  65% { transform: scale(1.36,1.48); opacity: .16; filter: blur(3px); }
+  100% { transform: scale(1.48,1.60); opacity: 0; filter: blur(3px); }
+}
+@keyframes mensah-direction-forward-in {
+  from { transform: scale(1.12); filter: blur(2px); }
+  to { transform: scale(1); filter: blur(0); }
+}
+@keyframes mensah-direction-back-out {
+  0% { transform: scale(1); opacity: 1; filter: blur(0); }
+  25% { transform: scale(.96); opacity: .95; filter: blur(.6px); }
+  70% { transform: scale(.80,.75); opacity: 0; filter: blur(2px); }
+  100% { transform: scale(.78,.72); opacity: 0; filter: blur(2px); }
+}
+@keyframes mensah-direction-back-in {
+  from { transform: scale(1.17); filter: blur(2px); }
+  to { transform: scale(1); filter: blur(0); }
+}
+.world-scene--turning .world-scene__image--current,
+.world-scene--turning .world-scene__image--incoming {
+  animation-duration: 340ms;
+  animation-timing-function: cubic-bezier(.3,.05,.25,1);
+}
+.world-scene--turning-left { --turn-out: 36%; --turn-in: -24%; }
+.world-scene--turning-right { --turn-out: -36%; --turn-in: 24%; }
+.world-scene--turning .world-scene__image--current {
+  z-index: 4;
+  animation-name: mensah-direction-turn-out;
+}
+.world-scene--turning .world-scene__image--incoming {
+  z-index: 3;
+  animation-name: mensah-direction-turn-in;
+}
+@keyframes mensah-direction-turn-out {
+  0% { transform: translateX(0) scaleX(1); opacity: 1; filter: blur(0); }
+  40% { opacity: .8; filter: blur(2px); }
+  100% { transform: translateX(var(--turn-out)) scaleX(1.18); opacity: 0; filter: blur(3px); }
+}
+@keyframes mensah-direction-turn-in {
+  from { transform: translateX(var(--turn-in)) scaleX(1.18); opacity: 1; filter: blur(3px); }
+  to { transform: translateX(0) scaleX(1); opacity: 1; filter: blur(0); }
+}
+.world-scene--turning .world-scene__markers,
+.world-scene--turning .look-zone,
+.world-scene:has(.world-scene__cinematic-curtain) .world-scene__markers {
+  opacity: 0; pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .world-scene--turning .world-scene__image--current,
+  .world-scene--turning .world-scene__image--incoming { animation: none; }
+}
+.transition-status {
+  position: fixed; left: 12px; bottom: 62px; z-index: 80;
+  padding: 8px 12px; border-radius: 6px; background: rgba(25,21,16,.9);
+  color: #f2e7d4; font: 13px system-ui,sans-serif;
+}
+
+.scene-motion-plate { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; pointer-events:none; mask-size:100% 100%; mask-repeat:no-repeat; -webkit-mask-size:100% 100%; -webkit-mask-repeat:no-repeat; }
+
+/* Dedicated detail plates use a short optical focus, with no footstep. */
+.world-scene--movement-inspect-in .world-scene__image--current,
+.world-scene--movement-inspect-out .world-scene__image--current,
+.world-scene--movement-inspect-fade .world-scene__image--current {
+  position: relative; z-index: 4; transform-origin: var(--motion-origin-x) var(--motion-origin-y);
+  animation: intercom-inspect-in var(--motion-duration) ease both !important;
+}
+.world-scene--movement-inspect-out .world-scene__image--current { animation-name: intercom-inspect-out !important; }
+.world-scene--movement-inspect-fade .world-scene__image--current { animation-name: intercom-inspect-fade !important; }
+.world-scene--movement-inspect-in .world-scene__image--walk-target,
+.world-scene--movement-inspect-out .world-scene__image--walk-target,
+.world-scene--movement-inspect-fade .world-scene__image--walk-target {
+  position: absolute; inset: 0; z-index: 3; opacity: 1; animation: none !important;
+}
+@keyframes intercom-inspect-in { from {opacity:1;transform:scale(1);} to {opacity:0;transform:scale(1.38);} }
+@keyframes intercom-inspect-out { from {opacity:1;transform:scale(1);} to {opacity:0;transform:scale(.9);} }
+@keyframes intercom-inspect-fade { from {opacity:1;} to {opacity:0;} }
+
+/* Screen-space return control stays visible even when the photo is cropped. */
+.scene-back-button {
+  position: absolute; z-index: 8; left: 50%;
+  bottom: max(24px, env(safe-area-inset-bottom)); transform: translateX(-50%);
+  min-height: 44px; padding: 11px 20px; border: 1px solid #ad9570;
+  border-radius: 8px; background: rgba(29,25,20,.93); color: #f4e8d4;
+  font: 14px system-ui, sans-serif; cursor: pointer; white-space: nowrap;
+}
+.scene-back-button:hover { background: #44392b; }
+.scene-back-button:focus-visible { outline: 2px solid #f5d59d; outline-offset: 4px; }

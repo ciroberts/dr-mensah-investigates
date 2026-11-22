@@ -1,3 +1,4 @@
+import OfficialSeal from "../documents/OfficialSeal";
 import CasePhoto from "./CasePhoto";
 
 export default function CaseBriefDocument({ caseData, onBegin }) {
@@ -38,6 +39,8 @@ export default function CaseBriefDocument({ caseData, onBegin }) {
                 image={caseData.briefPhoto}
                 caption={caseData.briefPhotoCaption}
             />
+
+            <OfficialSeal />
 
             <p className="signature">
                 {caseData.signedBy}
