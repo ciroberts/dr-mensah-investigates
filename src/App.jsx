@@ -95,7 +95,7 @@ export default function App() {
   const [reportInspection, setReportInspection] = useState(null);
   const [saveFailed, setSaveFailed] = useState(false);
   const [currentLocationId, setCurrentLocationId] = useState(getScene(progress.locationId, progress.sceneId) ? progress.locationId : INITIAL_LOCATION_ID);
-  const [currentSceneId, setCurrentSceneId] = useState(getScene(progress.locationId, progress.sceneId) && !["case-package", "office-photo"].includes(progress.sceneId) ? progress.sceneId : INITIAL_SCENE_ID);
+  const [currentSceneId, setCurrentSceneId] = useState(progress.sceneId === "intercom-close" ? "exterior" : getScene(progress.locationId, progress.sceneId) && !["case-package", "office-photo"].includes(progress.sceneId) ? progress.sceneId : INITIAL_SCENE_ID);
   const [currentViewId, setCurrentViewId] = useState(progress.viewId || null);
   const [lookTransition, setLookTransition] = useState(null);
   const [movementTransition, setMovementTransition] = useState(null);
@@ -242,10 +242,8 @@ export default function App() {
 
   const activateSceneMarker = async (marker) => {
     if (navigationPending.current || movementTransition || lookTransition || travelActive) return;
-    if (!marker.targetSceneId && marker.id === "scandbury-intercom-front") { setCurrentViewId("front-open"); return; }
-    if (!marker.targetSceneId && marker.id === "scandbury-intercom-open") { setCurrentViewId("front"); return; }
     if (marker.id === "scandbury-intercom") {
-      setNavigationMessage("Call button pressed. Intercom dialogue is not connected yet.");
+      setNavigationMessage("The intercom call connection is not yet available.");
       return;
     }
     if (marker.action === "inspection-back") {
@@ -266,7 +264,7 @@ export default function App() {
     if (!nextScene) return;
 
     // Close inspection stays immediate, with one precise mechanical cue in each direction.
-    if (currentLocationId === "investigator-desk" && Boolean(nextScene.focus || currentScene?.focus)) {
+    if (nextScene.focus || currentScene?.focus) {
       // Sound starts on activation; visuals follow just behind it so the
       // mechanical cue leads the lens movement rather than chasing it.
       playEffect(nextScene.focus ? FOCUS_SOUND_IN : FOCUS_SOUND_OUT, nextScene.focus ? 0.52 : 0.46);

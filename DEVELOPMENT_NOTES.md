@@ -41,3 +41,13 @@ Use Node 24 (verified) and `npm ci`, then `npm run dev`. No backend or credentia
 Validation completed against the supplied-source merge: production build and six progress tests pass; lint passes with seven pre-existing warnings.
 
 The existing organiser still scales its full desktop composition down on phones; its broader mobile layout is outside this change. Existing Calls placeholders and other unrelated prototype controls remain. The report itself uses the full viewport on mobile.
+
+## Intercom correction
+
+The roadside intercom marker is restored to image coordinates (38.9%, 61.7%) and uses proximity discovery. It opens an `intercom-close` inspection using the existing optical zoom and lens sounds. The call button has a separate proximity marker at (38.9%, 63.1%). Image-authored focus scenes transform the artwork and hotspots together, keeping the physical button aligned after cover cropping on desktop and mobile. Existing desk focus scenes retain their original framing.
+
+Removed the temporary roadside handlers that toggled the gate artwork immediately, the closed-gate travel shortcut, and the legacy courtyard bypass. The call button currently reports an unavailable connection; it does not open the gate. Future authored intercom dialogue must explicitly authorize the gate-opening fade before exposing the courtyard/central-palm progression. Open-gate and courtyard scenes remain authored for that future outcome.
+
+The separate `intercom-close.webp` was not supplied. The inspection currently magnifies the approved roadside artwork, which is visibly softer than a dedicated detail plate. No substitute image was generated. The existing inspection-history Back control restores the approach view. Reloading mid-inspection returns to the roadside to avoid a missing Back history.
+
+Verified in desktop (1440×900) and mobile (390×844) browser checks: proximity visibility, focus inspection, onscreen/aligned button, call without gate opening, no courtyard bypass, Back, reload recovery, lens-in/out cues, and absence of footsteps during inspection. Build and lint also checked; existing unrelated lint warnings remain.

@@ -75,8 +75,7 @@ export const caseScenes = {
             alt: "Scandbury Mansion viewed from the street beyond its front gates",
             look: { left: "left", right: "right" },
             markers: [
-              { id: "scandbury-intercom-front", x: 38.8, y: 67.5, label: "Intercom", type: "visible" },
-              { id: "scandbury-gate", x: 50, y: 61, label: "Gate", type: "visible", targetSceneId: "gate-close", transition: { type: "warp", surface: "pavement" } },
+              { id: "scandbury-intercom-front", x: 38.9, y: 61.7, label: "Inspect Intercom", type: "proximity", radius: 160, targetSceneId: "intercom-close" },
             ],
           },
           left: {
@@ -97,7 +96,7 @@ export const caseScenes = {
             alt: "Scandbury Mansion viewed from the roadside with the front gates open",
             look: { left: "left", right: "right" },
             markers: [
-              { id: "scandbury-intercom-open", x: 38.8, y: 67.5, label: "Intercom", type: "visible" },
+              { id: "scandbury-intercom-open", x: 38.9, y: 61.7, label: "Inspect Intercom", type: "proximity", radius: 160, targetSceneId: "intercom-close" },
               { id: "scandbury-courtyard-open", x: 50, y: 58, label: "Courtyard", type: "visible", targetSceneId: "inside-gate", transition: { type: "warp", surface: "pavement" } },
             ],
           },
@@ -149,28 +148,24 @@ export const caseScenes = {
           },
         ],
       },
+      "intercom-close": {
+        id: "intercom-close",
+        imageCoordinates: true,
+        allowsWorldTravel: false,
+        image: "/assets/scenes/001-scandbury-mansion/exterior-front-closed.png",
+        alt: "Close inspection of the entrance intercom",
+        // Reuse approved artwork until the dedicated detail plate is supplied.
+        focus: { x: 38.9, y: 61.7, scale: 5 },
+        markers: [
+          { id: "scandbury-intercom", x: 38.9, y: 63.1, label: "Press Call Button", type: "proximity", radius: 100 },
+        ],
+      },
       "gate-close": {
         id: "gate-close",
         allowsWorldTravel: true,
         image: "/assets/scenes/001-scandbury-mansion/gate-close.webp",
         alt: "Scandbury Mansion front gate viewed at close range",
         markers: [
-          {
-            id: "scandbury-intercom",
-            x: 20,
-            y: 55,
-            label: "Intercom",
-            type: "visible",
-          },
-          {
-            id: "perspective-walk-test",
-            x: 50,
-            y: 36,
-            label: "Courtyard",
-            type: "visible",
-            targetSceneId: "inside-gate",
-            transition: { type: "warp", surface: "pavement" },
-          },
           {
             id: "return-roadside",
             x: 50,
