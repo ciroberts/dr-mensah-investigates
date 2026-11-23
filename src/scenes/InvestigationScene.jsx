@@ -82,10 +82,23 @@ export default function InvestigationScene({
   // Atmosphere authored on the base scene currently belongs to the canonical front view.
   const atmosphere = view?.atmosphere ?? ((scene.views && view?.id !== scene.initialViewId) ? null : scene.atmosphere);
 
+  // Image-authored inspections share one camera transform with their hotspots.
+  // Cover cropping changes the screen position of a point, especially on phones.
+  const imageFocus = scene.imageCoordinates && scene.focus;
+  const focusX = imageFocus ? (viewport.width - imageSize.width * coverScale) / 2 + imageFocus.x / 100 * imageSize.width * coverScale : 0;
+  const focusY = imageFocus ? (viewport.height - imageSize.height * coverScale) / 2 + imageFocus.y / 100 * imageSize.height * coverScale : 0;
+  if (imageFocus) {
+    Object.assign(markerStyle, {
+      transformOrigin: `${imageFocus.x}% ${imageFocus.y}%`,
+      transform: `translate(${viewport.width / 2 - focusX}px, ${viewport.height / 2 - focusY}px) scale(${imageFocus.scale})`,
+    });
+  }
   const focusStyle = scene.focus ? {
     "--scene-scale": scene.focus.scale,
-    "--scene-origin-x": `${scene.focus.x}%`,
-    "--scene-origin-y": `${scene.focus.y}%`,
+    "--scene-origin-x": imageFocus ? `${focusX}px` : `${scene.focus.x}%`,
+    "--scene-origin-y": imageFocus ? `${focusY}px` : `${scene.focus.y}%`,
+    "--scene-offset-x": imageFocus ? `${viewport.width / 2 - focusX}px` : "0px",
+    "--scene-offset-y": imageFocus ? `${viewport.height / 2 - focusY}px` : "0px",
   } : undefined;
 
   const turnDirection = lookTransition?.direction || lookTransition;

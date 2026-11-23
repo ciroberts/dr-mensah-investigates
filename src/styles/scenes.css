@@ -10,7 +10,7 @@
   position: absolute;
   inset: 0;
   transform-origin: var(--scene-origin-x, 50%) var(--scene-origin-y, 50%);
-  transform: scale(var(--scene-scale, 1));
+  transform: translate(var(--scene-offset-x, 0px), var(--scene-offset-y, 0px)) scale(var(--scene-scale, 1));
   transition: transform 520ms cubic-bezier(.2,.72,.2,1);
 }
 
